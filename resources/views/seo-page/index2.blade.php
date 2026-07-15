@@ -637,7 +637,7 @@
         data-aos="fade-up" data-aos-delay="250">
 
         <div class="h-1/2 overflow-hidden">
-            <img src="{{ asset('images/ap2.jpg') }}" alt="Groupage Services"
+            <img src="{{ asset('images/APMDC Groupage.png') }}" alt="Groupage Services"
                 class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110">
         </div>
 
@@ -664,7 +664,7 @@
         data-aos="fade-up" data-aos-delay="300">
 
         <div class="h-1/2 overflow-hidden">
-            <img src="{{ asset('images/ap2.jpg') }}" alt="Ship-to-Shore Operations"
+            <img src="{{ asset('images/APMDC Ship to Shore.png') }}" alt="Ship-to-Shore Operations"
                 class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110">
         </div>
 
@@ -690,7 +690,7 @@
         data-aos="fade-up" data-aos-delay="350">
 
         <div class="h-1/2 overflow-hidden">
-            <img src="{{ asset('images/ap2.jpg') }}" alt="Warehousing & Inventory Management"
+            <img src="{{ asset('images/APMDC Warehouse.jpg') }}" alt="Warehousing & Inventory Management"
                 class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110">
         </div>
 
