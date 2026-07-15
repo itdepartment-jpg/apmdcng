@@ -355,7 +355,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Service 1 -->
-                <a href="#" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
+                <a href="/haulage-petroleum-products" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
                     data-aos="fade-up"  data-aos-delay="150">
 
                     <div class="flex items-start mb-4">
@@ -382,7 +382,7 @@
                 </a>
 
                 <!-- Service 2 -->
-                <a href="#" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
+                <a href="/general-cargo" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
                     data-aos="fade-up"  data-aos-delay="150">
 
                     <div class="flex items-start mb-4">
@@ -411,7 +411,7 @@
                 </a>
 
                 <!-- Service 3 -->
-                <a href="#" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
+                <a href="/general-cargo" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
                     data-aos="fade-up"  data-aos-delay="150">
 
                     <div class="flex items-start mb-4">
@@ -438,7 +438,7 @@
                 </a>
 
                 <!-- Service 4 -->
-              <a href="#" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
+              <a href="/agro-logistics-solutions" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
                     data-aos="fade-up"  data-aos-delay="150">
 
                     <div class="flex items-start mb-4">
@@ -465,7 +465,7 @@
                 </a>
 
                 <!-- Service 5 -->
-             <a href="#" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
+             <a href="/apmdc-ships-to-shore" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
                     data-aos="fade-up"  data-aos-delay="150">
 
                     <div class="flex items-start mb-4">
@@ -492,7 +492,7 @@
                 </a>
 
                  <!-- Service 6 -->
-              <a href="#" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
+              <a href="/general-cargo" class="service-item block bg-white border border-gray-200 p-6 rounded-2xl floating-card transition-all duration-300"
                     data-aos="fade-up"  data-aos-delay="150">
 
                     <div class="flex items-start mb-4">
@@ -563,7 +563,7 @@
         <div class="h-1/2 bg-white p-6 flex flex-col justify-between">
             <div>
                 <h3 class="text-xl font-bold mb-3">
-                    <a href="#"
+                    <a href="/general-cargo"
                         class="text-gray-800 hover:text-[#303791] transition-colors duration-300">
                         Rapid & Compliant Port Agency
                     </a>
@@ -589,7 +589,7 @@
         <div class="h-1/2 bg-white p-6 flex flex-col justify-between">
             <div>
                  <h3 class="text-xl font-bold mb-3">
-                    <a href="#"
+                    <a href="/off-docks"
                         class="text-gray-800 hover:text-[#303791] transition-colors duration-300">
                         Dedicated Support for Offshore Assets
                     </a>
@@ -617,7 +617,7 @@
         <div class="h-1/2 bg-white p-6 flex flex-col justify-between">
             <div>
                 <h3 class="text-xl font-bold mb-3">
-                    <a href="#"
+                    <a href="/protocol-logistics-services"
                         class="text-gray-800 hover:text-[#303791] transition-colors duration-300">
                         Customs Clearance & Inland Distribution
                     </a>
@@ -644,7 +644,7 @@
         <div class="h-1/2 bg-white p-6 flex flex-col justify-between">
             <div>
                 <h3 class="text-xl font-bold mb-3">
-                    <a href="#"
+                    <a href="international-freights"
                         class="text-gray-800 hover:text-[#303791] transition-colors duration-300">
                         Groupage Services
                     </a>
@@ -671,7 +671,7 @@
         <div class="h-1/2 bg-white p-6 flex flex-col justify-between">
             <div>
                 <h3 class="text-xl font-bold mb-3">
-                    <a href="#"
+                    <a href="/apmdc-ships-to-shore"
                         class="text-gray-800 hover:text-[#303791] transition-colors duration-300">
                         Ship-to-Shore Operations
                     </a>
@@ -697,7 +697,7 @@
         <div class="h-1/2 bg-white p-6 flex flex-col justify-between">
             <div>
                 <h3 class="text-xl font-bold mb-3">
-                    <a href="#"
+                    <a href="/warehousing-distribution"
                         class="text-gray-800 hover:text-[#303791] transition-colors duration-300">
                         Warehousing & Inventory Management
                     </a>
