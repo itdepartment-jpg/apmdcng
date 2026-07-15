@@ -1,0 +1,413 @@
+<script setup lang="ts">
+import {ref, computed, onMounted} from 'vue';
+import {Head, router, useForm} from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import {
+    CheckIcon,
+    PencilIcon,
+    PlusIcon,
+    TrashIcon,
+    ArrowPathIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    XMarkIcon,
+    DocumentTextIcon,
+    MagnifyingGlassIcon
+} from '@heroicons/vue/24/outline';
+import {ExclamationCircleIcon} from '@heroicons/vue/24/solid';
+import Modal from '@/Components/Modal.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextInput from '@/Components/TextInput.vue';
+import TextArea from '@/Components/TextArea.vue';
+import SelectInput from '@/Components/SelectInput.vue';
+import Checkbox from '@/Components/Checkbox.vue';
+import DangerButton from '@/Components/DangerButton.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+import Pagination from '@/Components/Pagination.vue';
+import {useToast} from '@/Composables/useToast';
+import WysiwygEditor from "@/Components/WysiwygEditor.vue";
+
+interface Category {
+    id: number;
+    name: string;
+}
+
+interface Project {
+    id: number;
+    title: string;
+    slug: string;
+    description: string;
+    full_description: string;
+    location: string;
+    client_name: string;
+    contractor: string;
+    scope_of_work: string;
+    status: 'active' | 'completed' | 'upcoming' | 'archived';
+    start_date: string;
+    end_date: string | null;
+    image_path: string;
+    vessel_image_path: string | null;
+    service_type: string | null;
+    is_featured: boolean;
+    categories: Category[];
+}
+
+interface Props {
+    projects: {
+        data: Project[];
+        current_page: number;
+        last_page: number;
+        next_page_url: string | null;
+        prev_page_url: string | null;
+        links: any[];
+    };
+    categories: Category[];
+    statusOptions: string[];
+    canEdit: boolean;
+}
+
+const props = defineProps<Props>();
+const {showSuccess, showError} = useToast();
+
+// State management
+const projects = ref(props.projects);
+const showFormModal = ref(false);
+const showDeleteModal = ref(false);
+const projectToDelete = ref<Project | null>(null);
+const projectToEdit = ref<Project | null>(null);
+const isLoading = ref(false);
+const imagePreview = ref<string | null>(null);
+const vesselImagePreview = ref<string | null>(null);
+const searchQuery = ref('');
+
+// Form handling
+const createForm = useForm({
+    title: '',
+    description: '',
+    full_description: '',
+    location: '',
+    client_name: '',
+    contractor: '',
+    scope_of_work: '',
+    status: 'active',
+    start_date: new Date().toISOString().slice(0, 10),
+    end_date: null as string | null,
+    image: null as File | null,
+    vessel_image: null as File | null,
+    service_type: '',
+    is_featured: false,
+    categories: [] as number[],
+});
+
+const editForm = useForm({
+    title: '',
+    description: '',
+    full_description: '',
+    location: '',
+    client_name: '',
+    contractor: '',
+    scope_of_work: '',
+    status: 'active',
+    start_date: new Date().toISOString().slice(0, 10),
+    end_date: null as string | null,
+    image: null as File | null,
+    vessel_image: null as File | null,
+    service_type: '',
+    is_featured: false,
+    categories: [] as number[],
+});
+
+// Computed properties
+const modalTitle = computed(() =>
+    projectToEdit.value ? 'Edit Project' : 'Create New Project'
+);
+
+const currentForm = computed(() =>
+    projectToEdit.value ? editForm : createForm
+);
+
+const filteredProjects = computed(() => {
+    if (!searchQuery.value) {
+        return projects.value.data;
+    }
+
+    const query = searchQuery.value.toLowerCase();
+    return projects.value.data.filter(project =>
+        project.title.toLowerCase().includes(query) ||
+        project.client_name.toLowerCase().includes(query) ||
+        project.location.toLowerCase().includes(query) ||
+        (project.contractor && project.contractor.toLowerCase().includes(query)) ||
+        project.status.toLowerCase().includes(query)
+    );
+});
+
+const formattedDate = (dateString: string | null) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+};
+
+// Methods
+const performSearch = () => {
+    router.get(route('projects.index'), { search: searchQuery.value }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true
+    });
+};
+
+const clearSearch = () => {
+    searchQuery.value = '';
+    router.get(route('projects.index'));
+};
+
+const openFormModal = (project: Project | null = null) => {
+    if (projectToEdit.value) {
+        editForm.clearErrors();
+    } else {
+        createForm.clearErrors();
+    }
+
+    projectToEdit.value = project;
+
+    if (project) {
+        editForm.title = project.title;
+        editForm.description = project.description;
+        editForm.full_description = project.full_description;
+        editForm.location = project.location;
+        editForm.client_name = project.client_name;
+        editForm.contractor = project.contractor;
+        editForm.scope_of_work = project.scope_of_work;
+        editForm.status = project.status;
+        editForm.start_date = project.start_date.slice(0, 10);
+        editForm.end_date = project.end_date ? project.end_date.slice(0, 10) : null;
+        editForm.service_type = project.service_type || '';
+        editForm.is_featured = project.is_featured;
+        editForm.categories = project.categories.map(c => c.id);
+        imagePreview.value = project.image_path ? `/storage/${project.image_path}` : null;
+        vesselImagePreview.value = project.vessel_image_path ? `/storage/${project.vessel_image_path}` : null;
+    } else {
+        createForm.reset();
+        imagePreview.value = null;
+        vesselImagePreview.value = null;
+    }
+
+    showFormModal.value = true;
+};
+
+// ... (keep all other existing methods the same)
+
+const statusBadgeColor = (status: string) => {
+    switch (status) {
+        case 'active': return 'bg-green-100 text-green-800';
+        case 'completed': return 'bg-blue-100 text-blue-800';
+        case 'upcoming': return 'bg-yellow-100 text-yellow-800';
+        case 'archived': return 'bg-gray-100 text-gray-800';
+        default: return 'bg-gray-100 text-gray-800';
+    }
+};
+
+const formattedEndDate = computed<string>({
+    get() {
+        return currentForm.value.end_date ?? '';
+    },
+    set(value: string) {
+        currentForm.value.end_date = value;
+    },
+});
+
+const handleCategoryCheck = (categoryId: number, checked: boolean) => {
+    const newCategories = [...currentForm.value.categories];
+    const index = newCategories.indexOf(categoryId);
+
+    if (checked && index === -1) {
+        newCategories.push(categoryId);
+    } else if (!checked && index !== -1) {
+        newCategories.splice(index, 1);
+    }
+
+    currentForm.value.categories = newCategories;
+};
+</script>
+
+<template>
+    <Head title="Projects Management"/>
+
+    <AuthenticatedLayout>
+        <template #header>
+            <h2 class="text-2xl font-bold leading-tight text-gray-800">
+                Projects Management
+            </h2>
+        </template>
+
+        <div class="py-6">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <!-- Header with create button and search -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                            <div class="w-full sm:w-1/2">
+                                <h1 class="text-2xl font-bold text-gray-900">Marine Projects</h1>
+                                <div class="mt-2 relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <MagnifyingGlassIcon class="h-5 w-5 text-gray-400"/>
+                                    </div>
+                                    <TextInput
+                                        v-model="searchQuery"
+                                        @keyup.enter="performSearch"
+                                        placeholder="Search projects..."
+                                        class="block w-full pl-10 pr-12"
+                                    />
+                                    <div class="absolute inset-y-0 right-0 flex items-center">
+                                        <button
+                                            v-if="searchQuery"
+                                            @click="clearSearch"
+                                            class="px-3 text-gray-400 hover:text-gray-500"
+                                        >
+                                            <XMarkIcon class="h-5 w-5"/>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <PrimaryButton @click="openFormModal()" class="flex items-center gap-2">
+                                <PlusIcon class="h-5 w-5"/>
+                                <span>New Project</span>
+                            </PrimaryButton>
+                        </div>
+
+                        <!-- Empty state -->
+                        <div v-if="filteredProjects.length === 0" class="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <DocumentTextIcon class="h-12 w-12 text-gray-400 mb-4"/>
+                                <h3 class="text-lg font-medium text-gray-900 mb-1">
+                                    No projects found
+                                </h3>
+                                <p class="text-sm text-gray-500 mb-4">
+                                    {{ searchQuery ? 'No projects match your search' : 'Get started by creating your first marine project' }}
+                                </p>
+                                <PrimaryButton @click="openFormModal()" class="flex items-center gap-2">
+                                    <PlusIcon class="h-5 w-5"/>
+                                    <span>New Project</span>
+                                </PrimaryButton>
+                            </div>
+                        </div>
+
+                        <!-- Projects table -->
+                        <div v-else class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Project
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Client
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Timeline
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Categories
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tr v-for="project in filteredProjects" :key="project.id">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <img class="h-10 w-10 rounded-md object-cover"
+                                                     :src="project.image_path ? `/storage/${project.image_path}` : '/images/default-project.png'"
+                                                     :alt="project.title"/>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ project.title }}
+                                                </div>
+                                                <div class="text-sm text-gray-500">
+                                                    {{ project.location }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">{{ project.client_name }}</div>
+                                        <div v-if="project.contractor" class="text-sm text-gray-500">
+                                            {{ project.contractor }}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span :class="`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusBadgeColor(project.status)}`">
+                                            {{ project.status }}
+                                        </span>
+                                        <span v-if="project.is_featured" class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                            <CheckIcon class="h-3 w-3 mr-1"/>
+                                            Featured
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            {{ formattedDate(project.start_date) }}
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            {{ formattedDate(project.end_date) }}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex flex-wrap gap-1">
+                                            <span v-for="category in project.categories"
+                                                  :key="category.id"
+                                                  class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
+                                                {{ category.name }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <button
+                                                @click="openFormModal(project)"
+                                                class="text-blue-600 hover:text-blue-900 p-1 rounded-md hover:bg-blue-50"
+                                                title="Edit"
+                                            >
+                                                <PencilIcon class="h-5 w-5"/>
+                                            </button>
+                                            <button
+                                                @click="openDeleteModal(project)"
+                                                class="text-red-600 hover:text-red-900 p-1 rounded-md hover:bg-red-50"
+                                                title="Delete"
+                                            >
+                                                <TrashIcon class="h-5 w-5"/>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Pagination -->
+                            <Pagination
+                                :links="projects.links"
+                                :current-page="projects.current_page"
+                                :last-page="projects.last_page"
+                                @page-changed="loadPage"
+                                class="mt-6"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keep all the modal code the same as before -->
+    </AuthenticatedLayout>
+</template>

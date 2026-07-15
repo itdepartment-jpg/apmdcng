@@ -1,0 +1,133 @@
+<template>
+    <Head :title="pressRelease ? 'Edit Press Release' : 'Create Press Release'" />
+
+    <AuthenticatedLayout>
+        <template #header>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                {{ pressRelease ? 'Edit' : 'Create' }} Press Release
+            </h2>
+        </template>
+
+        <div class="py-12">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white p-6 shadow-sm sm:rounded-lg">
+                    <form @submit.prevent="submitForm">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Title</label>
+                            <input
+                                v-model="form.title"
+                                type="text"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-200"
+                            />
+                            <span v-if="form.errors.title" class="text-red-500 text-sm">{{ form.errors.title }}</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Summary</label>
+                            <textarea
+                                v-model="form.summary"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-200"
+                                rows="3"
+                            ></textarea>
+                            <span v-if="form.errors.summary" class="text-red-500 text-sm">{{ form.errors.summary }}</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Content</label>
+                            <WysiwygEditor v-model="form.content" />
+                            <span v-if="form.errors.content" class="text-red-500 text-sm">{{ form.errors.content }}</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Release Date</label>
+                            <input
+                                v-model="form.released_at"
+                                type="date"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-indigo-200"
+                            />
+                            <span v-if="form.errors.released_at" class="text-red-500 text-sm">{{ form.errors.released_at }}</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700">PDF Upload</label>
+                            <input type="file" accept="application/pdf" @change="handlePdfUpload" />
+
+                            <div v-if="pdfName" class="mt-2 flex items-center space-x-2">
+                                <span class="text-sm text-gray-600">{{ pdfName }}</span>
+                                <button type="button" @click="removePdf" class="text-red-500 text-sm hover:underline">Remove</button>
+                            </div>
+
+                            <span v-if="form.errors.pdf" class="text-red-500 text-sm">{{ form.errors.pdf }}</span>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button
+                                type="submit"
+                                class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded hover:bg-indigo-500"
+                                :disabled="form.processing"
+                            >
+                                {{ pressRelease ? 'Update' : 'Create' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useForm, Head } from '@inertiajs/vue3'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import WysiwygEditor from '@/Components/WysiwygEditor.vue'
+
+interface PressRelease {
+    id?: number
+    title: string
+    summary: string
+    content: string
+    released_at: string
+    pdf_path?: string
+}
+
+const props = defineProps<{
+    pressRelease?: PressRelease
+}>()
+
+const form = useForm({
+    title: props.pressRelease?.title || '',
+    summary: props.pressRelease?.summary || '',
+    content: props.pressRelease?.content || '',
+    released_at: props.pressRelease?.released_at?.split(' ')[0] || new Date().toISOString().split('T')[0],
+    pdf: null as File | null,
+    pdf_path: props.pressRelease?.pdf_path || null,
+})
+
+const pdfName = computed(() => {
+    if (form.pdf) return form.pdf.name
+    if (form.pdf_path) return form.pdf_path.split('/').pop()
+    return ''
+})
+
+function handlePdfUpload(event: Event) {
+    const input = event.target as HTMLInputElement
+    const file = input.files?.[0]
+    if (file) {
+        form.pdf = file
+    }
+}
+
+function removePdf() {
+    form.pdf = null
+    form.pdf_path = null
+}
+
+function submitForm() {
+    if (props.pressRelease) {
+        form.post(route('press-releases.update', props.pressRelease.id), { _method: 'put' })
+    } else {
+        form.post(route('press-releases.store'))
+    }
+}
+</script>

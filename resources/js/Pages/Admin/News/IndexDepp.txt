@@ -1,0 +1,488 @@
+
+
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
+import {Head, router, useForm, usePage} from '@inertiajs/vue3';
+import type { PageProps } from '@/types';
+import {CheckIcon, PencilIcon, PlusIcon, TrashIcon } from "@heroicons/vue/24/outline";
+import LeadershipMemberCard from "@/Components/LeadershipMemberCard.vue";
+import KeyPersonnelCard from "@/Components/KeyPersonnelCard.vue";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import EmptyState from "@/Components/EmptyState.vue";
+import WysiwygEditor from "@/Components/WysiwygEditor.vue";
+
+const props = defineProps<{
+    latestNews: any,
+    featuredArticle: any,
+    categories: string[],
+    canEdit: boolean
+}>();
+
+const articles = ref(props.latestNews);
+const categories = ref(props.categories);
+
+const showForm = ref(false);
+const editingId = ref<number | null>(null);
+const imagePreview = ref<string | null>(null);
+const tagsInput = ref('');
+
+const form = useForm({
+    title: '',
+    excerpt: '',
+    content: '',
+    category: 'Projects',
+    published_at: '',
+    tags: [] as string[],
+    is_featured: false,
+    image: null as File | null,
+});
+
+function openForm(article: any = null) {
+    showForm.value = true;
+    editingId.value = article?.id || null;
+    if (article) {
+        form.title = article.title;
+        form.excerpt = article.excerpt;
+        form.content = article.content;
+        form.category = article.category;
+        form.published_at = article.published_at;
+        form.tags = article.tags;
+        form.is_featured = article.is_featured;
+        imagePreview.value = article.featured_image_url || null;
+        tagsInput.value = article.tags?.join(', ') || '';
+    } else {
+        form.reset();
+        tagsInput.value = '';
+        imagePreview.value = null;
+    }
+}
+
+function closeForm() {
+    showForm.value = false;
+    form.reset();
+    editingId.value = null;
+    imagePreview.value = null;
+}
+
+
+function formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+}
+function submitForm() {
+    form.tags = tagsInput.value.split(',').map(tag => tag.trim()).filter(Boolean);
+
+    const method = editingId.value ? 'put' : 'post';
+    const url = editingId.value ? route('news.update', editingId.value) : route('news.store');
+
+    form[method](url, {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeForm();
+            router.reload({ only: ['latestNews'] });
+        },
+    });
+}
+
+function handleImageChange(e: Event) {
+    const file = (e.target as HTMLInputElement)?.files?.[0];
+    if (file) {
+        form.image = file;
+        const reader = new FileReader();
+        reader.onload = e => {
+            imagePreview.value = e.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function confirmDelete(id: number) {
+    if (confirm('Are you sure you want to delete this article?')) {
+        router.delete(route('news.destroy', id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                router.reload({ only: ['latestNews'] });
+            }
+        });
+    }
+}
+function goToPage(url: string | null) {
+    if (url) {
+        router.visit(url, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    }
+}
+
+
+function nextPage() {
+    if (articles.value.next_page_url) {
+        router.visit(articles.value.next_page_url, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    }
+}
+
+function previousPage() {
+    if (articles.value.prev_page_url) {
+        router.visit(articles.value.prev_page_url, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    }
+}
+</script>
+
+
+<template>
+
+
+    <Head title="Dashboard" />
+
+    <AuthenticatedLayout>
+        <template #header>
+            <h2
+                class="text-xl font-semibold leading-tight text-gray-800"
+            >
+                Leadership
+            </h2>
+        </template>
+
+        <div class="py-12">
+
+            <div class="p-6 bg-gray-50 min-h-screen">
+                <!-- Header Section -->
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">News Management</h1>
+                        <p class="text-gray-600">Manage your news articles and publications</p>
+                    </div>
+                    <button
+                        @click="openForm()"
+                        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-md"
+                    >
+                        <PlusIcon class="h-5 w-5" />
+                        <span>Add News</span>
+                    </button>
+                </div>
+
+                <!-- Empty State -->
+                <div v-if="articles.data.length === 0" class="bg-white rounded-xl shadow-sm p-8 text-center">
+                    <div class="mx-auto max-w-md">
+                        <DocumentTextIcon class="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 class="mt-2 text-lg font-medium text-gray-900">No articles yet</h3>
+                        <p class="mt-1 text-gray-500">Get started by creating your first news article.</p>
+                        <div class="mt-6">
+                            <button
+                                @click="openForm()"
+                                class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm"
+                            >
+                                <PlusIcon class="h-4 w-4 mr-2" />
+                                Add News
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Articles Table -->
+                <div v-else class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <!-- Table -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Published</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tr v-for="article in articles.data" :key="article.id" class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div v-if="article.featured_image" class="flex-shrink-0 h-10 w-10 mr-3">
+                                            <img class="h-10 w-10 rounded-md object-cover" :src="article.featured_image" alt="">
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-gray-900">{{ article.title }}</div>
+                                            <div class="text-sm text-gray-500 line-clamp-1">{{ article.excerpt }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+              <span class="px-2 py-1 text-xs font-semibold rounded-full"
+                    :class="{
+                  'bg-purple-100 text-purple-800': article.category === 'Projects',
+                  'bg-blue-100 text-blue-800': article.category === 'Awards',
+                  'bg-green-100 text-green-800': article.category === 'Innovations',
+                  'bg-yellow-100 text-yellow-800': article.category === 'Partnerships'
+                }">
+                {{ article.category }}
+              </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ formatDate(article.published_at) }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+              <span v-if="article.is_featured" class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                Featured
+              </span>
+                                    <span v-else class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                Regular
+              </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-3">
+                                        <button
+                                            @click="openForm(article)"
+                                            class="text-blue-600 hover:text-blue-900"
+                                            title="Edit"
+                                        >
+                                            <PencilIcon class="h-5 w-5" />
+                                        </button>
+                                        <button
+                                            @click="confirmDelete(article.id)"
+                                            class="text-red-600 hover:text-red-900"
+                                            title="Delete"
+                                        >
+                                            <TrashIcon class="h-5 w-5" />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="bg-white px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                        <div class="flex-1 flex justify-between sm:hidden">
+                            <button
+                                @click="previousPage"
+                                :disabled="!articles.prev_page_url"
+                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                :class="{ 'opacity-50 cursor-not-allowed': !articles.prev_page_url }"
+                            >
+                                Previous
+                            </button>
+                            <button
+                                @click="nextPage"
+                                :disabled="!articles.next_page_url"
+                                class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                :class="{ 'opacity-50 cursor-not-allowed': !articles.next_page_url }"
+                            >
+                                Next
+                            </button>
+                        </div>
+                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm text-gray-700">
+                                    Showing <span class="font-medium">{{ articles.meta.from }}</span> to
+                                    <span class="font-medium">{{ articles.meta.to }}</span> of
+                                    <span class="font-medium">{{ articles.meta.total }}</span> results
+                                </p>
+                            </div>
+                            <div>
+                                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                    <button
+                                        v-for="(link, index) in articles.meta.links"
+                                        :key="index"
+                                        @click="goToPage(link.url)"
+                                        :disabled="!link.url || link.active"
+                                        class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                                        :class="{
+                'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': !link.active && link.url,
+                'z-10 bg-blue-50 border-blue-500 text-blue-600': link.active,
+                'bg-gray-100 text-gray-400 cursor-not-allowed': !link.url
+              }"
+                                        v-html="link.label"
+                                    />
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Create/Edit Modal -->
+                <Modal :show="showForm" @close="closeForm">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                            {{ editingId ? 'Edit Article' : 'Create New Article' }}
+                        </h2>
+
+                        <form @submit.prevent="submitForm">
+                            <div class="space-y-4">
+                                <!-- Title -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                                    <input
+                                        v-model="form.title"
+                                        type="text"
+                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        required
+                                    >
+                                </div>
+
+                                <!-- Excerpt -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Excerpt *</label>
+                                    <textarea
+                                        v-model="form.excerpt"
+                                        rows="3"
+                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        required
+                                    ></textarea>
+                                </div>
+
+                                <!-- Content -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Content *</label>
+                                    <WysiwygEditor v-model="form.content" />
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Category -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                                        <select
+                                            v-model="form.category"
+                                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            required
+                                        >
+                                            <option
+                                                v-for="category in categories"
+                                                :key="category"
+                                                :value="category"
+                                            >
+                                                {{ category }}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Published At -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Published At *</label>
+                                        <input
+                                            type="datetime-local"
+                                            v-model="form.published_at"
+                                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            required
+                                        >
+                                    </div>
+                                </div>
+
+                                <!-- Tags -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                                    <div class="flex flex-wrap gap-2 mb-2">
+              <span
+                  v-for="(tag, index) in form.tags"
+                  :key="index"
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+              >
+                {{ tag }}
+                <button
+                    type="button"
+                    @click="removeTag(index)"
+                    class="ml-1 text-gray-500 hover:text-gray-700"
+                >
+                  <XMarkIcon class="h-3 w-3" />
+                </button>
+              </span>
+                                    </div>
+                                    <div class="flex">
+                                        <input
+                                            v-model="tagInput"
+                                            @keydown.enter.prevent="addTag"
+                                            type="text"
+                                            class="flex-grow rounded-l-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                            placeholder="Add tag (press Enter)"
+                                        >
+                                        <button
+                                            type="button"
+                                            @click="addTag"
+                                            class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gray-50 text-gray-500 rounded-r-md hover:bg-gray-100"
+                                        >
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Featured -->
+                                <div class="flex items-center">
+                                    <input
+                                        v-model="form.is_featured"
+                                        type="checkbox"
+                                        id="is_featured"
+                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    >
+                                    <label for="is_featured" class="ml-2 block text-sm text-gray-700">
+                                        Feature this article
+                                    </label>
+                                </div>
+
+                                <!-- Image Upload -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Featured Image</label>
+                                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                        <div class="space-y-1 text-center">
+                                            <template v-if="!imagePreview && !form.featured_image">
+                                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                </svg>
+                                                <div class="flex text-sm text-gray-600">
+                                                    <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                                        <span>Upload an image</span>
+                                                        <input id="file-upload" name="file-upload" type="file" class="sr-only" @change="handleImageChange">
+                                                    </label>
+                                                    <p class="pl-1">or drag and drop</p>
+                                                </div>
+                                                <p class="text-xs text-gray-500">PNG, JPG up to 2MB</p>
+                                            </template>
+                                            <template v-else>
+                                                <img :src="imagePreview || form.featured_image" class="mx-auto h-48 object-contain">
+                                                <button
+                                                    type="button"
+                                                    @click="removeImage"
+                                                    class="mt-2 text-sm text-red-600 hover:text-red-500"
+                                                >
+                                                    Remove image
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 flex justify-end space-x-3">
+                                <button
+                                    type="button"
+                                    @click="closeForm"
+                                    class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                    :disabled="form.processing"
+                                >
+                                    <span v-if="form.processing">Processing...</span>
+                                    <span v-else>{{ editingId ? 'Update' : 'Create' }} Article</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </Modal>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>

@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Illuminate\Http\Request;
+use Inertia\Middleware;
+
+class HandleInertiaRequests extends Middleware
+{
+    /**
+     * The root template that is loaded on the first page visit.
+     *
+     * @var string
+     */
+    protected $rootView = 'app';
+
+    /**
+     * Determine the current asset version.
+     */
+    public function version(Request $request): ?string
+    {
+        return parent::version($request);
+    }
+
+    /**
+     * Define the props that are shared by default.
+     *
+     * @return array<string, mixed>
+     */
+    public function share(Request $request): array
+    {
+        $user = $request->user();
+
+        return [
+            ...parent::share($request),
+            'auth' => [
+                'user' => $user ? [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'roles' => $user->getRoleNames()->values(),
+                    'permissions' => $user->getAllPermissions()->pluck('name')->values(),
+                    'isSuperAdmin' => $user->hasRole('super-admin'),
+                    'can' => [
+                        'viewUsers' => $user->can('view users'),
+                        'createUsers' => $user->can('create users'),
+                        'editUsers' => $user->can('edit users'),
+                        'deleteUsers' => $user->can('delete users'),
+                        'manageRoles' => $user->can('manage roles'),
+                        'editLeadership' => $user->can('edit_leadership'),
+                        'manageNews' => $user->can('manage_news'),
+                        'manageProjects' => $user->can('manage projects'),
+                        'manageProjectCategories' => $user->can('manage project categories'),
+                        'manageClientProjects' => $user->can('manage client projects'),
+                        'manageNotes' => $user->can('manage notes'),
+                    ],
+                ] : null,
+            ],
+        ];
+    }
+}

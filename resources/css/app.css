@@ -1,0 +1,362 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --tertiary-color: #ffc107;
+}
+
+/* Swiper.js Custom Styles */
+.testimonial-slider {
+    padding: 20px 0;
+    overflow: hidden;
+}
+
+.swiper-slide {
+    opacity: 0.5;
+    transform: scale(0.9);
+    transition: all 0.4s ease;
+    height: auto;
+}
+
+.swiper-slide-active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.swiper-pagination-bullet {
+    width: 8px;
+    height: 8px;
+    background: #d1d5db;
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+    width: 20px;
+    background: #ea222f;
+    border-radius: 10px;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    color: #333;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.swiper-button-next {
+    right: 20px;
+}
+
+.swiper-button-prev {
+    left: 20px;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    content: "";
+    font-size: 0;
+}
+
+@media (max-width: 768px) {
+    .swiper-button-next,
+    .swiper-button-prev {
+        display: none;
+    }
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Base Styles */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* Preloader */
+#preloader {
+    transition: opacity 0.5s ease;
+}
+
+.loader {
+    border-top-color: #ea222f;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Hero Section */
+.herobg {
+    background: url("assets/images/amp.jpg") no-repeat center center;
+    background-size: cover;
+    min-height: 90vh;
+}
+
+/* Floating Elements */
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Gradient Text */
+.text-gradient {
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Custom Shadows */
+.shadow-custom {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .herobg {
+        min-height: 70vh;
+    }
+
+    .hero-content {
+        padding-top: 100px;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+        line-height: 1.2;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+}
+
+/* AOS Animation Delays */
+[data-aos-delay="100"] {
+    transition-delay: 100ms;
+}
+
+[data-aos-delay="200"] {
+    transition-delay: 200ms;
+}
+
+[data-aos-delay="300"] {
+    transition-delay: 300ms;
+}
+
+[data-aos-delay="400"] {
+    transition-delay: 400ms;
+}
+
+/* Hero Section Animations */
+@keyframes float-1 {
+    0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-20px) translateX(10px) rotate(2deg);
+    }
+
+    100% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+    }
+}
+
+@keyframes float-2 {
+    0% {
+        transform: translateY(0) translateX(0) rotate(-5deg);
+    }
+
+    50% {
+        transform: translateY(15px) translateX(-15px) rotate(5deg);
+    }
+
+    100% {
+        transform: translateY(0) translateX(0) rotate(-5deg);
+    }
+}
+
+@keyframes float-3 {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse-slow {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.1;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.05);
+        opacity: 0.15;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.1;
+    }
+}
+
+@keyframes draw-line {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0) translateX(-50%);
+    }
+
+    40% {
+        transform: translateY(-20px) translateX(-50%);
+    }
+
+    60% {
+        transform: translateY(-10px) translateX(-50%);
+    }
+}
+
+/* Apply Animations */
+.animate-float-1 {
+    animation: float-1 8s ease-in-out infinite;
+}
+
+.animate-float-2 {
+    animation: float-2 10s ease-in-out infinite;
+}
+
+.animate-float-3 {
+    animation: float-3 6s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 8s ease-in-out infinite;
+}
+
+.animate-draw-line {
+    animation: draw-line 2s forwards ease-in-out;
+}
+
+.animate-bounce {
+    animation: bounce 2s infinite;
+}
+
+/* Gradient Text */
+.text-gradient-accent {
+    background-image: linear-gradient(to right, #ea222f, #5c6bc0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Button Hover Effects */
+.btn-gradient-hover {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn-gradient-hover::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to right, #d11a26, #ea222f);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.btn-gradient-hover:hover::before {
+    opacity: 1;
+}
+
+/* Mobile menu improvements */
+@media (max-width: 1023px) {
+    #mobile-menu {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        z-index: 40;
+    }
+
+    .nav-link span {
+        display: none;
+    }
+}
+
+/* Image responsiveness */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Service cards height adjustment */
+@media (max-width: 640px) {
+    .service-card {
+        height: auto !important;
+    }
+}

@@ -1,0 +1,195 @@
+<script setup lang="ts">
+import { Head, useForm } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { DocumentIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextInput from '@/Components/TextInput.vue';
+import TextArea from '@/Components/TextArea.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+
+interface PressRelease {
+    id?: number;
+    title: string;
+    summary: string;
+    content: string;
+    released_at: string;
+    pdf_path: string | null;
+    pdf_url: string | null;
+}
+
+interface Props {
+    pressRelease?: PressRelease;
+}
+
+const props = defineProps<Props>();
+
+const form = useForm({
+    title: props.pressRelease?.title || '',
+    summary: props.pressRelease?.summary || '',
+    content: props.pressRelease?.content || '',
+    released_at: props.pressRelease?.released_at.slice(0, 16) || new Date().toISOString().slice(0, 16),
+    pdf: null as File | null,
+    pdf_path: props.pressRelease?.pdf_path || null
+});
+
+const handlePdfChange = (e: Event) => {
+    const file = (e.target as HTMLInputElement)?.files?.[0];
+    if (file) {
+        form.pdf = file;
+    }
+};
+
+const removePdf = () => {
+    form.pdf = null;
+    form.pdf_path = null;
+};
+
+const submit = () => {
+    if (props.pressRelease?.id) {
+        form.put(route('press-releases.update', props.pressRelease.id));
+    } else {
+        form.post(route('press-releases.store'));
+    }
+};
+</script>
+
+<template>
+    <Head :title="pressRelease ? 'Edit Press Release' : 'Create Press Release'" />
+
+    <AuthenticatedLayout>
+        <template #header>
+            <h2 class="text-2xl font-bold leading-tight text-gray-800">
+                {{ pressRelease ? 'Edit Press Release' : 'Create New Press Release' }}
+            </h2>
+        </template>
+
+        <div class="py-6">
+            <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <form @submit.prevent="submit">
+                            <div class="space-y-6">
+                                <!-- Title -->
+                                <div>
+                                    <InputLabel for="title" value="Title" required />
+                                    <TextInput
+                                        id="title"
+                                        v-model="form.title"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        :class="{ 'border-red-500': form.errors.title }"
+                                        required
+                                    />
+                                    <p v-if="form.errors.title" class="mt-1 text-sm text-red-600">
+                                        {{ form.errors.title }}
+                                    </p>
+                                </div>
+
+                                <!-- Summary -->
+                                <div>
+                                    <InputLabel for="summary" value="Summary" required />
+                                    <TextArea
+                                        id="summary"
+                                        v-model="form.summary"
+                                        rows="3"
+                                        class="mt-1 block w-full"
+                                        :class="{ 'border-red-500': form.errors.summary }"
+                                        required
+                                        maxlength="500"
+                                    />
+                                    <p class="mt-1 text-xs text-gray-500">
+                                        {{ form.summary.length }}/500 characters
+                                    </p>
+                                    <p v-if="form.errors.summary" class="mt-1 text-sm text-red-600">
+                                        {{ form.errors.summary }}
+                                    </p>
+                                </div>
+
+                                <!-- Content -->
+                                <div>
+                                    <InputLabel for="content" value="Content" required />
+                                    <TextArea
+                                        id="content"
+                                        v-model="form.content"
+                                        rows="10"
+                                        class="mt-1 block w-full"
+                                        :class="{ 'border-red-500': form.errors.content }"
+                                        required
+                                    />
+                                    <p v-if="form.errors.content" class="mt-1 text-sm text-red-600">
+                                        {{ form.errors.content }}
+                                    </p>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Release Date -->
+                                    <div>
+                                        <InputLabel for="released_at" value="Release Date" required />
+                                        <TextInput
+                                            id="released_at"
+                                            v-model="form.released_at"
+                                            type="datetime-local"
+                                            class="mt-1 block w-full"
+                                            :class="{ 'border-red-500': form.errors.released_at }"
+                                            required
+                                        />
+                                        <p v-if="form.errors.released_at" class="mt-1 text-sm text-red-600">
+                                            {{ form.errors.released_at }}
+                                        </p>
+                                    </div>
+
+                                    <!-- PDF Upload -->
+                                    <div>
+                                        <InputLabel for="pdf" value="PDF Attachment" />
+                                        <div class="mt-1">
+                                            <div v-if="form.pdf_path || form.pdf" class="flex items-center gap-3 mb-2">
+                                                <DocumentIcon class="h-8 w-8 text-gray-400" />
+                                                <span class="text-sm text-gray-600">
+                          {{ form.pdf?.name || 'Existing PDF attached' }}
+                        </span>
+                                                <button
+                                                    type="button"
+                                                    @click="removePdf"
+                                                    class="text-red-500 hover:text-red-700"
+                                                >
+                                                    <XMarkIcon class="h-5 w-5" />
+                                                </button>
+                                            </div>
+                                            <input
+                                                id="pdf"
+                                                type="file"
+                                                accept=".pdf"
+                                                @change="handlePdfChange"
+                                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                            />
+                                            <p class="mt-1 text-sm text-gray-500">
+                                                PDF only (Max 5MB)
+                                            </p>
+                                            <p v-if="form.errors.pdf" class="mt-1 text-sm text-red-600">
+                                                {{ form.errors.pdf }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="mt-6 flex justify-end space-x-3">
+                                <SecondaryButton
+                                    :href="pressRelease ? route('press-releases.show', pressRelease.id) : route('press-releases.index')"
+                                    type="button"
+                                >
+                                    Cancel
+                                </SecondaryButton>
+                                <PrimaryButton type="submit" :disabled="form.processing">
+                                    {{ pressRelease ? 'Update' : 'Create' }} Press Release
+                                </PrimaryButton>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>

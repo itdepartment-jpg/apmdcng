@@ -1,0 +1,664 @@
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import {
+    CheckIcon,
+    PencilIcon,
+    PlusIcon,
+    TrashIcon,
+    ArrowPathIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    XMarkIcon,
+    DocumentTextIcon
+} from '@heroicons/vue/24/outline';
+import { ExclamationCircleIcon } from '@heroicons/vue/24/solid';
+import Modal from '@/Components/Modal.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextInput from '@/Components/TextInput.vue';
+import TextArea from '@/Components/TextArea.vue';
+import SelectInput from '@/Components/SelectInput.vue';
+import Checkbox from '@/Components/Checkbox.vue';
+import DangerButton from '@/Components/DangerButton.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+import Pagination from '@/Components/Pagination.vue';
+import WysiwygEditor from '@/Components/WysiwygEditor.vue';
+import { useToast } from '@/Composables/useToast';
+
+interface Article {
+    id: number;
+    title: string;
+    excerpt: string;
+    content: string;
+    category: string;
+    published_at: string;
+    tags: string[];
+    is_featured: boolean;
+    featured_image_url: string | null;
+}
+
+interface Props {
+    latestNews: {
+        data: Article[];
+        current_page: number;
+        last_page: number;
+        next_page_url: string | null;
+        prev_page_url: string | null;
+        links: any[];
+    };
+    featuredArticle: Article | null;
+    categories: string[];
+    canEdit: boolean;
+}
+
+const props = defineProps<Props>();
+const { showSuccess, showError } = useToast();
+
+// State management
+const articles = ref(props.latestNews);
+const showFormModal = ref(false);
+const showDeleteModal = ref(false);
+const articleToDelete = ref<Article | null>(null);
+const articleToEdit = ref<Article | null>(null);
+const isLoading = ref(false);
+const imagePreview = ref<string | null>(null);
+
+// Form handling - separate forms for create and edit
+const createForm = useForm({
+    title: '',
+    excerpt: '',
+    content: '',
+    category: 'Projects',
+    published_at: new Date().toISOString().slice(0, 16),
+    tags: [] as string[],
+    tagsInput: '',
+    is_featured: false,
+    image: null as File | null,
+});
+
+const editForm = useForm({
+    title: '',
+    excerpt: '',
+    content: '',
+    category: 'Projects',
+    published_at: new Date().toISOString().slice(0, 16),
+    tags: [] as string[],
+    tagsInput: '',
+    is_featured: false,
+    image: null as File | null,
+});
+
+// Computed properties
+const modalTitle = computed(() =>
+    articleToEdit.value ? 'Edit Article' : 'Create New Article'
+);
+
+const currentForm = computed(() =>
+    articleToEdit.value ? editForm : createForm
+);
+
+const formattedDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+};
+
+// Methods
+const openFormModal22 = (article: Article | null = null) => {
+    articleToEdit.value = article;
+
+    if (article) {
+        editForm.title = article.title;
+        editForm.excerpt = article.excerpt;
+        editForm.content = article.content;
+        editForm.category = article.category;
+        editForm.published_at = article.published_at.slice(0, 16);
+        editForm.tagsInput = article.tags.join(', ');
+        editForm.tags = [...article.tags];
+        editForm.is_featured = article.is_featured;
+        imagePreview.value = article.featured_image_url;
+    } else {
+        createForm.reset();
+        imagePreview.value = null;
+    }
+
+    showFormModal.value = true;
+};
+
+const closeFormModal = () => {
+    showFormModal.value = false;
+    if (articleToEdit.value) {
+        editForm.reset();
+    } else {
+        createForm.reset();
+    }
+    articleToEdit.value = null;
+    imagePreview.value = null;
+};
+
+const openDeleteModal = (article: Article) => {
+    articleToDelete.value = article;
+    showDeleteModal.value = true;
+};
+
+const closeDeleteModal = () => {
+    showDeleteModal.value = false;
+    articleToDelete.value = null;
+};
+
+const handleImageChange = (e: Event) => {
+    const file = (e.target as HTMLInputElement)?.files?.[0];
+    if (file) {
+        const form = articleToEdit.value ? editForm : createForm;
+        form.image = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imagePreview.value = e.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+const storeArticle = async () => {
+    createForm.tags = createForm.tagsInput
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(tag => tag.length > 0);
+
+    try {
+        isLoading.value = true;
+        await createForm.post(route('news.store'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                showSuccess('Article created successfully');
+                closeFormModal();
+                // router.reload({ only: ['latestNews'] });
+            },
+            onError: (errors) => {
+                showError('There was an error creating the article');
+            },
+        });
+    } finally {
+        isLoading.value = false;
+    }
+};
+
+
+const openFormModal = (article: Article | null = null) => {
+    articleToEdit.value = article;
+
+    if (article) {
+        editForm.title = article.title;
+        editForm.excerpt = article.excerpt;
+        editForm.content = article.content;
+        editForm.category = article.category;
+        editForm.published_at = article.published_at.slice(0, 16);
+        editForm.tagsInput = article.tags.join(', ');
+        editForm.tags = [...article.tags];
+        editForm.is_featured = article.is_featured;
+        imagePreview.value = article.featured_image_url;
+    } else {
+        createForm.reset();
+        imagePreview.value = null;
+    }
+
+    showFormModal.value = true;
+};
+
+const updateArticle = async () => {
+    if (!articleToEdit.value) return;
+
+    editForm.tags = editForm.tagsInput
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(tag => tag.length > 0);
+
+    try {
+        isLoading.value = true;
+
+        // Create FormData and append all fields
+        const formData = new FormData();
+        formData.append('_method', 'PUT'); // For Laravel to recognize as PUT request
+        formData.append('title', editForm.title);
+        formData.append('excerpt', editForm.excerpt);
+        formData.append('content', editForm.content);
+        formData.append('category', editForm.category);
+        formData.append('published_at', editForm.published_at);
+        formData.append('tagsInput', editForm.tagsInput);
+        formData.append('is_featured', editForm.is_featured ? '1' : '0');
+
+        // Only append image if a new one was selected
+        if (editForm.image) {
+            formData.append('image', editForm.image);
+        }
+
+        // Send the request
+        await router.post(route('news.update', articleToEdit.value.id), formData, {
+            preserveScroll: true,
+            onSuccess: () => {
+                showSuccess('Article updated successfully');
+                closeFormModal();
+                router.reload({ only: ['latestNews'] });
+            },
+            onError: (errors) => {
+                showError('There was an error updating the article');
+            },
+        });
+    } finally {
+        isLoading.value = false;
+    }
+};
+const updateArticleXXX = async () => {
+    if (!articleToEdit.value) return;
+
+    editForm.tags = editForm.tagsInput
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(tag => tag.length > 0);
+
+    try {
+        isLoading.value = true;
+        await editForm.put(route('news.update', articleToEdit.value.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                showSuccess('Article updated successfully');
+                closeFormModal();
+                router.reload({ only: ['latestNews'] });
+            },
+            onError: (errors) => {
+                showError('There was an error updating the article');
+            },
+        });
+    } finally {
+        isLoading.value = false;
+    }
+};
+
+const deleteArticle = async () => {
+    if (!articleToDelete.value) return;
+
+    try {
+        isLoading.value = true;
+        await router.delete(route('news.destroy', articleToDelete.value.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                showSuccess('Article deleted successfully');
+                closeDeleteModal();
+                router.reload({ only: ['latestNews'] });
+            },
+            onError: () => {
+                showError('There was an error deleting the article');
+            },
+        });
+    } finally {
+        isLoading.value = false;
+    }
+};
+
+const loadPage = (url: string | null) => {
+    if (!url) return;
+    router.visit(url, {
+        preserveState: true,
+        preserveScroll: true,
+        onSuccess: () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+    });
+};
+
+const truncateUntilKeyword = (text: string, wordCount: number): string => {
+    const words = text.split(' ');
+    return words.slice(0, wordCount).join(' ') + (words.length > wordCount ? '...' : '');
+};
+</script>
+
+<template>
+    <Head title="News Management" />
+
+    <AuthenticatedLayout>
+        <template #header>
+            <h2 class="text-2xl font-bold leading-tight text-gray-800">
+                News Management
+            </h2>
+        </template>
+
+        <div class="py-6">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <!-- Header with create button -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                            <div>
+                                <h1 class="text-2xl font-bold text-gray-900">News Articles</h1>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Manage all news articles and featured content
+                                </p>
+                            </div>
+                            <PrimaryButton @click="openFormModal()" class="flex items-center gap-2">
+                                <PlusIcon class="h-5 w-5" />
+                                <span>New Article</span>
+                            </PrimaryButton>
+                        </div>
+
+                        <!-- Empty state -->
+                        <div v-if="articles.data.length === 0" class="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <DocumentTextIcon class="h-12 w-12 text-gray-400 mb-4" />
+                                <h3 class="text-lg font-medium text-gray-900 mb-1">
+                                    No articles yet
+                                </h3>
+                                <p class="text-sm text-gray-500 mb-4">
+                                    Get started by creating your first news article
+                                </p>
+                                <PrimaryButton @click="openFormModal()" class="flex items-center gap-2">
+                                    <PlusIcon class="h-5 w-5" />
+                                    <span>New Article</span>
+                                </PrimaryButton>
+                            </div>
+                        </div>
+
+                        <!-- Articles table -->
+                        <div v-else class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Title
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Category
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Published
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Featured
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tr v-for="article in articles.data" :key="article.id">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            {{ article.title }}
+                                        </div>
+                                        <div class="text-sm text-gray-500 line-clamp-2">
+                                            {{ truncateUntilKeyword(article.excerpt, 8) }}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            {{ article.category }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ formattedDate(article.published_at) }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span v-if="article.is_featured" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <CheckIcon class="h-3 w-3 mr-1" />
+                                            Featured
+                                        </span>
+                                        <span v-else class="text-xs text-gray-500">-</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <button
+                                                @click="openFormModal(article)"
+                                                class="text-blue-600 hover:text-blue-900 p-1 rounded-md hover:bg-blue-50"
+                                                title="Edit"
+                                            >
+                                                <PencilIcon class="h-5 w-5" />
+                                            </button>
+                                            <button
+                                                @click="openDeleteModal(article)"
+                                                class="text-red-600 hover:text-red-900 p-1 rounded-md hover:bg-red-50"
+                                                title="Delete"
+                                            >
+                                                <TrashIcon class="h-5 w-5" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Pagination -->
+                            <Pagination
+                                :links="articles.links"
+                                :current-page="articles.current_page"
+                                :last-page="articles.last_page"
+                                @page-changed="loadPage"
+                                class="mt-6"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create/Edit Modal -->
+        <Modal :show="showFormModal" @close="closeFormModal" max-width="3xl">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        {{ modalTitle }}
+                    </h3>
+                    <button
+                        @click="closeFormModal"
+                        class="text-gray-400 hover:text-gray-500 focus:outline-none"
+                    >
+                        <XMarkIcon class="h-6 w-6" />
+                    </button>
+                </div>
+
+                <form @submit.prevent="articleToEdit ? updateArticle() : storeArticle()" enctype="multipart/form-data">
+                    <div class="space-y-6">
+                        <!-- Title -->
+                        <div>
+                            <InputLabel for="title" value="Title" required />
+                            <TextInput
+                                id="title"
+                                v-model="currentForm.title"
+                                type="text"
+                                class="mt-1 block w-full"
+                                :class="{ 'border-red-500': currentForm.errors.title }"
+                                required
+                            />
+                            <p v-if="currentForm.errors.title" class="mt-1 text-sm text-red-600">
+                                {{ currentForm.errors.title }}
+                            </p>
+                        </div>
+
+                        <!-- Excerpt -->
+                        <div>
+                            <InputLabel for="excerpt" value="Excerpt" required />
+                            <TextArea
+                                id="excerpt"
+                                v-model="currentForm.excerpt"
+                                rows="3"
+                                class="mt-1 block w-full"
+                                :class="{ 'border-red-500': currentForm.errors.excerpt }"
+                                required
+                            />
+                            <p v-if="currentForm.errors.excerpt" class="mt-1 text-sm text-red-600">
+                                {{ currentForm.errors.excerpt }}
+                            </p>
+                        </div>
+
+                        <!-- Content -->
+                        <div>
+                            <InputLabel for="content" value="Content" required />
+                            <WysiwygEditor
+                                id="content"
+                                v-model="currentForm.content"
+                                class="mt-1"
+                                :class="{ 'border-red-500': currentForm.errors.content }"
+                            />
+                            <p v-if="currentForm.errors.content" class="mt-1 text-sm text-red-600">
+                                {{ currentForm.errors.content }}
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Category -->
+                            <div>
+                                <InputLabel for="category" value="Category" required />
+                                <SelectInput
+                                    id="category"
+                                    v-model="currentForm.category"
+                                    class="mt-1 block w-full"
+                                    :options="categories"
+                                    :class="{ 'border-red-500': currentForm.errors.category }"
+                                    required
+                                />
+                                <p v-if="currentForm.errors.category" class="mt-1 text-sm text-red-600">
+                                    {{ currentForm.errors.category }}
+                                </p>
+                            </div>
+
+                            <!-- Published At -->
+                            <div>
+                                <InputLabel for="published_at" value="Publish Date" required />
+                                <TextInput
+                                    id="published_at"
+                                    v-model="currentForm.published_at"
+                                    type="datetime-local"
+                                    class="mt-1 block w-full"
+                                    :class="{ 'border-red-500': currentForm.errors.published_at }"
+                                    required
+                                />
+                                <p v-if="currentForm.errors.published_at" class="mt-1 text-sm text-red-600">
+                                    {{ currentForm.errors.published_at }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        <div>
+                            <InputLabel for="tags" value="Tags" />
+                            <TextInput
+                                id="tags"
+                                v-model="currentForm.tagsInput"
+                                type="text"
+                                class="mt-1 block w-full"
+                                placeholder="Comma separated tags"
+                                :class="{ 'border-red-500': currentForm.errors.tags }"
+                            />
+                            <p v-if="currentForm.errors.tags" class="mt-1 text-sm text-red-600">
+                                {{ currentForm.errors.tags }}
+                            </p>
+                        </div>
+
+                        <!-- Featured -->
+                        <div class="flex items-center">
+                            <Checkbox
+                                v-model:checked="currentForm.is_featured"
+                                id="is_featured"
+                                class="mr-2"
+                            />
+                            <InputLabel for="is_featured" value="Featured Article" />
+                        </div>
+
+                        <!-- Image Upload -->
+                        <div>
+                            <InputLabel for="image" value="Featured Image" />
+                            <div class="mt-1 flex items-center gap-4">
+                                <div class="flex-1">
+                                    <input
+                                        id="image"
+                                        type="file"
+                                        accept="image/*"
+                                        @change="handleImageChange"
+                                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                    />
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        JPEG, PNG or GIF (Max 2MB)
+                                    </p>
+                                    <p v-if="currentForm.errors.image" class="mt-1 text-sm text-red-600">
+                                        {{ currentForm.errors.image }}
+                                    </p>
+                                </div>
+                                <div v-if="imagePreview" class="flex-shrink-0">
+                                    <img
+                                        :src="imagePreview"
+                                        class="h-16 w-16 rounded-md object-cover"
+                                        alt="Preview"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Form Actions -->
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <SecondaryButton @click="closeFormModal" type="button">
+                            Cancel
+                        </SecondaryButton>
+                        <PrimaryButton type="submit" :disabled="currentForm.processing">
+                            <ArrowPathIcon v-if="currentForm.processing" class="h-4 w-4 animate-spin mr-2" />
+                            {{ articleToEdit ? 'Update' : 'Create' }} Article
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </div>
+        </Modal>
+
+        <!-- Delete Confirmation Modal -->
+        <Modal :show="showDeleteModal" @close="closeDeleteModal" max-width="md">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        Delete Article
+                    </h3>
+                    <button
+                        @click="closeDeleteModal"
+                        class="text-gray-400 hover:text-gray-500 focus:outline-none"
+                    >
+                        <XMarkIcon class="h-6 w-6" />
+                    </button>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="mr-3 flex-shrink-0">
+                        <ExclamationCircleIcon class="h-12 w-12 text-red-500" />
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">
+                            Are you sure you want to delete this article?
+                        </h4>
+                        <p class="text-sm text-gray-500">
+                            This action cannot be undone. All data associated with this article will be permanently removed.
+                        </p>
+                        <p v-if="articleToDelete" class="mt-2 font-medium">
+                            "{{ articleToDelete.title }}"
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <SecondaryButton @click="closeDeleteModal" type="button">
+                        Cancel
+                    </SecondaryButton>
+                    <DangerButton
+                        @click="deleteArticle"
+                        type="button"
+                        :disabled="isLoading"
+                    >
+                        <ArrowPathIcon v-if="isLoading" class="h-4 w-4 animate-spin mr-2" />
+                        Delete Article
+                    </DangerButton>
+                </div>
+            </div>
+        </Modal>
+    </AuthenticatedLayout>
+</template>

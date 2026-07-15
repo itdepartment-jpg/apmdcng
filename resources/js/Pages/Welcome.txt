@@ -1,0 +1,14 @@
+<template>
+  <Landing>
+    <Hero />
+    <About />
+    <Shop />
+  </Landing>
+</template>
+
+<script setup>
+import Landing from "@/Layouts/Landing.vue";
+import Hero from "@/Components/Hero.vue";
+import Shop from "@/Components/Shop.vue";
+import About from "@/Components/about.vue";
+</script>

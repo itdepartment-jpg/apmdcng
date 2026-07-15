@@ -1,0 +1,218 @@
+<script setup lang="ts">
+import { computed, ref, watch } from "vue";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { Head, useForm } from "@inertiajs/vue3";
+import InputLabelx from "@/Components/InputLabelx.vue";
+import SearchDropdown from "@/Components/SearchDropdown.vue";
+import CurrencyInput from "@/Components/CurrencyInput.vue";
+
+interface Vendor {
+    id: number;
+    business_name: string;
+    payment_details: PaymentDetail[];
+}
+
+interface PaymentDetail {
+    id: number;
+    vendor_id: number;
+    bank_name: string;
+    account_number: string;
+    account_name: string;
+    currency_code: string;
+    payment_method: string;
+    business_name: string;
+}
+
+// Define props
+const props = defineProps<{ vendors: Vendor[] }>();
+
+// Refs
+const selectedVendor = ref<Vendor | null>(null);
+const selectedPaymentDetail = ref<PaymentDetail | null>(null);
+const filteredPaymentDetails = ref<PaymentDetail[]>([]);
+const vendors = ref<Vendor[]>(props.vendors || []);
+
+// Form
+const form = useForm({
+    vendor_id: 0,
+    vendor_payment_detail_id:0,
+    amount_on_invoice: "",
+    amount_in_naira: "",
+    service_fee_in_naira: "",
+    total_in_naira: "",
+    remarks:"",
+    from_currency:"",
+    invoice: null,
+});
+
+// Computed for combined payment details
+const combinedPaymentDetails = computed(() =>
+    filteredPaymentDetails.value.map((detail) => ({
+        ...detail,
+        combinedDetails: `${detail.bank_name} - ${detail.account_name} - ${detail.account_number}`,
+    }))
+);
+
+// Watchers
+watch(selectedVendor, (newVendor) => {
+    if (newVendor) {
+        filteredPaymentDetails.value = newVendor.payment_details;
+    } else {
+        filteredPaymentDetails.value = [];
+    }
+    form.vendor_id = newVendor ? newVendor.id : 0;
+});
+
+// selectedPaymentDetail
+
+
+watch(
+    [() => form.amount_on_invoice, () => selectedPaymentDetail.value?.currency_code, () => selectedPaymentDetail.value?.id],
+    ([newAmount, currencyCode, id]) => {
+        if (!currencyCode) return;
+
+        const amountOnInvoice = parseFloat(newAmount) || 0;
+        const exchangeRates: Record<string, number> = {
+            USD: 1700,
+            GBP: 2000,
+        };
+        const exchangeRate = exchangeRates[currencyCode] || 1;
+        const amountInNaira = amountOnInvoice * exchangeRate;
+        const serviceCharge = amountInNaira * 0.05;
+
+        form.amount_in_naira = amountInNaira.toFixed(2);
+        form.service_fee_in_naira = serviceCharge.toFixed(2);
+        form.total_in_naira = (amountInNaira + serviceCharge).toFixed(2);
+        form.vendor_payment_detail_id = id;
+        form.from_currency = currencyCode;
+
+    }
+);
+
+const submitForm = () => {
+    form.post(route('transaction.store'), {
+        onSuccess: () => {
+            alert('Form submitted successfully!');
+        },
+        onError: (errors) => {
+            console.error('Form submission errors:', errors);
+        },
+    });
+};
+
+const handleFileUpload = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+        form.invoice = target.files[0]; // Assign the uploaded file
+    }
+};
+
+// Handle Input Errors
+const handleInputError = (error: unknown) => {
+    if (error instanceof Error) {
+        console.error(`Input Error: ${error.message}`);
+    } else {
+        console.error("Unknown input error", error);
+    }
+};
+</script>
+
+<template>
+    <Head title="New Payment" />
+    <AuthenticatedLayout>
+        <template #header>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">New Payment</h2>
+        </template>
+        <div class="py-12">
+            <form @submit.prevent="submitForm"  class="max-w-sm">
+                <div>
+                    <SearchDropdown
+                        :items="vendors"
+                        displayKey="business_name"
+                        label="Vendor"
+                        placeholder="Search vendor..."
+                        inputId="vendor-search"
+                        v-model="selectedVendor"
+                        @input-error="handleInputError"
+                    />
+                    <div v-if="form.errors.vendor_id" class="text-red-500 text-sm">
+                        {{ form.errors.vendor_id }}
+                    </div>
+                </div>
+                <div>
+                    <SearchDropdown
+                        :items="combinedPaymentDetails"
+                        displayKey="combinedDetails"
+                        label="Payment Details"
+                        placeholder="Select payment detail..."
+                        input-id="payment-details-search"
+                        v-model="selectedPaymentDetail"
+                        @input-error="handleInputError"
+                    />
+
+                </div>
+                <div class="mb-5">
+                    <InputLabelx v-show="!selectedPaymentDetail" for="text" value="Amount on Invoice" />
+                                         <InputLabelx v-show="selectedPaymentDetail" for="text" :value="`Amount on Invoice (${selectedPaymentDetail?.currency_code})`" />
+<!--                                         <InputLabelx v-show="selectedPaymentDetail" for="text"-->
+<!--                                                      :value="selectedPaymentDetail ? `Amount on Invoice (${selectedPaymentDetail.currency_code})` : 'Amount on Invoice'"-->
+
+<!--                    />-->
+                    <CurrencyInput
+                        id="amount_on_invoice"
+                        v-model="form.amount_on_invoice"
+                        required
+                        placeholder="Enter amount"
+                    />
+                </div>
+                <div class="mb-5">
+                    <InputLabelx for="text" value="Amount (₦)" />
+                    <div class="currency-display p-2 bg-gray-50 border rounded-md">
+                        {{ form.amount_in_naira || "0.00" }}
+                    </div>
+                </div>
+                <div class="mb-5">
+                    <InputLabelx for="text" value="Service Fee (5%)" />
+                    <div class="currency-display p-2 bg-gray-50 border rounded-md">
+                        {{ form.service_fee_in_naira || "0.00" }}
+                    </div>
+                </div>
+                <div class="mb-5">
+                    <InputLabelx for="text" value="Total Payable (₦)" />
+                    <div class="currency-display p-2 bg-gray-50 border rounded-md">
+                        {{ form.total_in_naira || "0.00" }}
+                    </div>
+                </div>
+                <div class="mb-5">
+                    <InputLabelx for="text" value="Upload Invoice" />
+                    <input
+                        class="block w-full text-xs text-gray-900 border rounded-lg bg-gray-50"
+                        type="file"
+                        @change="handleFileUpload"
+                    />
+                    <div v-if="form.errors.invoice" class="text-red-500 text-sm">
+                        {{ form.errors.invoice }}
+                    </div>
+                </div>
+                <div class="mb-5">
+                    <InputLabelx for="text" value="Remarks / Comments" />
+                    <textarea id="message" rows="4"
+                              v-model="form.remarks"
+                              class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Leave a comment..."></textarea>
+                    <div v-if="form.errors.invoice" class="text-red-500 text-sm">
+                        {{ form.errors.remarks }}
+                    </div>
+                </div>
+                <button
+                    type=""
+                    :disabled="form.total_in_naira == 0"
+                    :class="form.total_in_naira ==  0 ? 'bg-gray-500':'bg-blue-700 hover:bg-blue-800'"
+                    @click="submitForm"
+                    class="text-white   focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5"
+                >
+                    Start Transaction
+                </button>
+            </form>
+        </div>
+    </AuthenticatedLayout>
+</template>

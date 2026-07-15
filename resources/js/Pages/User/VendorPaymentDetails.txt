@@ -1,0 +1,504 @@
+<script setup lang="ts">
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import {Head, useForm} from '@inertiajs/vue3';
+import {onMounted, ref, watch} from 'vue';
+import TextInputx from '@/Components/TextInputx.vue';
+import InputLabelx from '@/Components/InputLabelx.vue';
+import PrimaryButtonx from '@/Components/PrimaryButtonx.vue';
+import DeleteConfirmationModal from '@/Components/DeleteConfirmatiomModal.vue'
+import {VendorPaymentDetails} from '@/types/vendorpaymentdetails';
+import {Vendor} from '@/types/vendor';
+import SearchDropdown from '@/Components/SearchDropdown.vue';
+
+// import countriesData from '@/Jsons/CountriesCurrencyCode';
+
+
+interface Country {
+    name: string;
+    code: string;
+    currency: string
+}
+
+const countries = ref<Country[]>([]);
+onMounted(() => {
+    countries.value = countriesData;
+});
+// Props
+// const props = defineProps({
+//     vendorpaymentdetails: Array<VendorPaymentDetails>,
+//     vendors: Array<Vendor>,
+//
+//
+// });
+
+const props = defineProps<{
+    vendors?: Vendor[],
+    vendorpaymentdetails?: VendorPaymentDetails[],
+}>();
+
+const vendors = ref<Vendor[]>(props.vendors ?? []);
+
+
+// Delete confirmation modal
+const deleteConfirmationMessage = ref("Are you sure you want to delete this Vendor Payment Details?");
+const deleteConfirmButtonText = ref("Yes, I'm sure");
+const deleteCancelButtonText = ref("No, cancel");
+
+const showModal = ref<boolean>(false);
+const editMode = ref<boolean>(false);
+const deleteModal = ref<boolean>(false);
+const currentId = ref<string>('');
+
+const form = useForm<VendorPaymentDetails>({
+    id: 0,
+    vendor_id: 0,
+    bank_name: '',
+    account_number: '',
+    account_name: '',
+    currency_code: '',
+    payment_method: '',
+    business_name: '',
+    routing_number: ''
+
+
+});
+
+
+const formreset = () => {
+    form.bank_name = '';
+    form.vendor_id = 0;
+    form.account_number = '';
+    form.account_name = '';
+    form.currency_code = '';
+    form.payment_method = '';
+    form.routing_number = ''
+
+
+};
+const deleteData = () => {
+    const vendorpaymentdetails = currentId.value;
+    // console.log(currentId.value);
+    form.delete(route('vendor-payment-details.destroy', {vendor_payment_detail: vendorpaymentdetails}), {
+        onFinish: () => {
+            deleteModal.value = false;
+        },
+    });
+};
+
+
+const getId = (vendorpaymentdetails: VendorPaymentDetails) => {
+    currentId.value = String(vendorpaymentdetails.id);
+    deleteModal.value = true;
+};
+
+
+const closedeltemodal = () => {
+    deleteModal.value = false;
+};
+
+const newModal = () => {
+    showModal.value = false;
+    formreset();
+    showModal.value = true;
+};
+
+const updateData = () => {
+
+    if (!selectedVendor.value) {
+        return
+    }
+    // console.log(form.id)
+    form.patch(route('vendor-payment-details.update', {vendor_payment_detail: form.id}), {
+        onFinish: () => {
+            // form.reset('name', 'desc');
+            formreset();
+            showModal.value = false;
+        },
+    });
+};
+
+
+const editModal = (vendorpaymentdetails: VendorPaymentDetails) => {
+    console.log(vendorpaymentdetails.id)
+
+    showModal.value = false;
+    formreset();
+    editMode.value = true;
+    form.id = vendorpaymentdetails.id
+    form.vendor_id = vendorpaymentdetails.id
+    // form.business_name =
+    form.bank_name = vendorpaymentdetails.bank_name;
+    form.account_number = vendorpaymentdetails.account_number;
+    form.account_name = vendorpaymentdetails.account_name;
+    form.currency_code = vendorpaymentdetails.currency_code;
+    form.payment_method = vendorpaymentdetails.payment_method;
+
+    console.log(form.id)
+
+
+    showModal.value = true;
+};
+
+const closeModal = () => {
+    showModal.value = false;
+    editMode.value = false;
+};
+
+
+// JSON list of vendors
+const vendors1 = ref([
+    {id: 1, business_name: 'Vendor A'},
+    {id: 2, business_name: 'Vendor B'},
+    {id: 3, business_name: 'Vendor C'},
+    {id: 4, business_name: 'Vendor D'},
+]);
+
+
+const selectedVendor = ref<{ id: number; business_name: string } | null>(null);
+
+const handleInputError = (errorMessage: string) => {
+    console.error(errorMessage);
+};
+// Watch for changes in selectedVendor
+watch(selectedVendor, (newValue) => {
+    if (newValue) {
+        form.vendor_id = newValue.id
+    } else {
+        form.vendor_id = 0
+    }
+})
+
+// Emits definition
+const emit = defineEmits<{
+    (e: 'close'): void
+}>()
+
+// Submit handler
+const submit = () => {
+    if (!selectedVendor.value) {
+        return
+    }
+
+    form.post(route('vendor-payment-details.store'), {
+        onSuccess: () => {
+            showModal.value = false
+            selectedVendor.value = null
+            form.reset()
+            // emit('close')
+        },
+    })
+}
+
+</script>
+
+<template>
+    <Head title="Vendor Account Details"/>
+
+    <AuthenticatedLayout>
+
+        <!--        {{notices}}-->
+
+
+        <div class="py-6">
+            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                        <div
+                            class="flex flex-wrap items-center justify-between pb-4 space-y-4 bg-white flex-column md:flex-row md:space-y-0">
+                            <div class="mt-4 ml-5">
+                                <button @click="newModal" data-modal-target="static-modal"
+                                        data-modal-toggle="static-modal"
+                                        class="inline-flex items-center px-3 py-2 pl-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
+                                        type="button">
+                                    <div class="pr-1">Add</div>
+                                    <svg class="w-3 h-3 mb-1 text-white me-2" aria-hidden="true"
+                                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 16">
+                                        <path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z"></path>
+                                    </svg>
+                                </button>
+
+                                <div v-show="showModal" class="fixed inset-0 bg-black bg-opacity-50"></div>
+                                <div :class="{ 'hidden': !showModal }"
+                                     class="flex overflow-y-auto overflow-x-hidden fixed top-1/2 right-1/2 left-1/2 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                                    <div class="relative w-full max-w-2xl max-h-full p-4">
+                                        <div class="relative bg-white rounded-lg shadow">
+                                            <div
+                                                class="flex items-center justify-between p-4 border-b rounded-t md:p-5">
+                                                <h3 class="text-xl font-semibold text-gray-900" v-if="!editMode">
+                                                    Add </h3>
+                                                <h3 class="text-xl font-semibold text-gray-900" v-if="editMode">
+                                                    Edit </h3>
+                                                <button @click="closeModal" type="button"
+                                                        class="inline-flex items-center justify-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg hover:bg-gray-200 hover:text-gray-900 ms-auto"
+                                                        data-modal-hide="static-modal">
+                                                    <svg class="w-3 h-3" aria-hidden="true"
+                                                         xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                         viewBox="0 0 14 14">
+                                                        <path stroke="currentColor" stroke-linecap="round"
+                                                              stroke-linejoin="round" stroke-width="2"
+                                                              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                                    </svg>
+                                                    <span class="sr-only">Close modal</span>
+                                                </button>
+                                            </div>
+                                            <div class="p-4 space-y-4 md:p-5">
+                                                <form class="max-w-sm mx-auto">
+                                                    <div>
+                                                        <SearchDropdown
+                                                            :items="vendors"
+                                                            displayKey="business_name"
+                                                            label="Vendor"
+                                                            placeholder="Search vendor..."
+                                                            inputId="vendor-search"
+                                                            v-model="selectedVendor"
+                                                            @input-error="handleInputError"
+                                                        />
+                                                        <!--                                                        <p v-if="selectedVendor">Selected Vendor: {{ selectedVendor.business_name }}</p>-->
+                                                        <div v-if="form.errors.vendor_id" class="text-red-500 text-sm">
+                                                            {{ form.errors.vendor_id }}
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="mb-5">
+                                                        <InputLabelx for="email" value="Account Number"/>
+                                                        <TextInputx
+                                                            id="account_number"
+                                                            type="text"
+                                                            v-model="form.account_number"
+                                                            required
+                                                            autofocus
+                                                            placeholder=""
+                                                            autocomplete="off"
+                                                        />
+                                                        <div v-if="form.errors.account_number"
+                                                             class="text-red-500 text-sm">
+                                                            {{ form.errors.account_number }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mb-5">
+                                                        <InputLabelx for="email" value="Routing Number"/>
+                                                        <TextInputx
+                                                            id="account_number"
+                                                            type="text"
+                                                            v-model="form.routing_number"
+                                                            required
+                                                            autofocus
+                                                            placeholder=""
+                                                            autocomplete="off"
+                                                        />
+                                                        <div v-if="form.errors.routing_number"
+                                                             class="text-red-500 text-sm">
+                                                            {{ form.errors.routing_number }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mb-5">
+                                                        <InputLabelx for="email" value="Bank Name"/>
+                                                        <TextInputx
+                                                            id="bank_name"
+                                                            type="text"
+                                                            v-model="form.bank_name"
+                                                            required
+                                                            autofocus
+                                                            placeholder=""
+                                                            autocomplete="off"
+                                                        />
+                                                        <div v-if="form.errors.bank_name" class="text-red-500 text-sm">
+                                                            {{ form.errors.bank_name }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mb-5">
+                                                        <InputLabelx for="name" value="Account Name"/>
+                                                        <TextInputx
+                                                            id="account_name"
+                                                            type="text"
+                                                            v-model="form.account_name"
+                                                            required
+                                                            autofocus
+                                                            placeholder=""
+                                                            autocomplete="off"
+                                                        />
+                                                        <div v-if="form.errors.account_number"
+                                                             class="text-red-500 text-sm">
+                                                            {{ form.errors.account_name }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+                                                        <SearchDropdown
+                                                            :items="countries"
+                                                            displayKey="name"
+                                                            label="Currency"
+                                                            placeholder="Search Currency..."
+                                                            inputId="currency-search"
+                                                            v-model="selectedVendor"
+                                                            @input-error="handleInputError"
+                                                        />
+                                                        <!--                                                        <p v-if="selectedVendor">Selected Vendor: {{ selectedVendor.business_name }}</p>-->
+                                                        <div v-if="form.errors.currency_code"
+                                                             class="text-red-500 text-sm">
+                                                            {{ form.errors.currency_code }}
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="mb-5">
+                                                        <InputLabelx for="name" value="Payment Method"/>
+                                                        <TextInputx
+                                                            id="payment_method"
+                                                            type="text"
+                                                            v-model="form.payment_method"
+                                                            required
+                                                            autofocus
+                                                            placeholder=""
+                                                            autocomplete="off"
+                                                        />
+                                                        <div v-if="form.errors.payment_method"
+                                                             class="text-red-500 text-sm">
+                                                            {{ form.errors.payment_method }}
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </form>
+                                            </div>
+                                            <div
+                                                class="flex items-center justify-center p-4 border-t border-gray-200 rounded-b md:p-5">
+                                                <PrimaryButtonx @click="submit" v-if="!editMode" class="text-center"
+                                                                :class="{ 'opacity-25': form.processing }"
+                                                                :disabled="form.processing">
+                                                    Create
+                                                </PrimaryButtonx>
+                                                <PrimaryButtonx @click="updateData" v-show="editMode"
+                                                                class="text-center"
+                                                                :class="{ 'opacity-25': form.processing }"
+                                                                :disabled="form.processing">
+                                                    Update
+                                                </PrimaryButtonx>
+                                                <button @click="closeModal" type="button"
+                                                        class="ms-3 text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <!-- Reusable Delete Confirmation Modal -->
+                                    <delete-confirmation-modal
+                                        :show-modal="deleteModal"
+                                        :message="deleteConfirmationMessage"
+                                        :confirm-button-text="deleteConfirmButtonText"
+                                        :cancel-button-text="deleteCancelButtonText"
+                                        :confirm-action="deleteData"
+                                        :close-modal="closedeltemodal"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="w-full text-sm text-left text-gray-500 rtl:text-right">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th scope="col" class="p-4">
+                                    <div class="flex items-center">
+                                        <!-- <input id="checkbox-all-search" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                        <label for="checkbox-all-search" class="sr-only">checkbox</label> -->
+                                    </div>
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap w-full">
+                                    S/N
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap w-full">
+                                    Vendor
+                                </th>
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap w-full">
+                                    Bank Name
+                                </th>
+
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap w-full">
+                                    Account Number
+                                </th>
+
+
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap w-full">
+                                    Account Name
+                                </th>
+
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap w-full">
+                                    Currency
+                                </th>
+
+                                <th scope="col"
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap w-full">
+                                    Payment Method
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="vendorpaymentdetails in vendorpaymentdetails" :key="vendorpaymentdetails.id"
+                                class="bg-white border-b hover:bg-gray-50">
+                                <td class="w-4 p-4">
+                                    <div class="flex items-center">
+                                        <input id="checkbox-table-search-1" type="checkbox"
+                                               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                        <label for="checkbox-table-search-1" class="sr-only">checkbox</label>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-left  text-gray-500  tracking-wider whitespace-nowrap w-full">
+                                    {{ vendorpaymentdetails.id }}
+                                </td>
+                                <td class="px-6 py-4 text-left  text-gray-500  tracking-wider whitespace-nowrap w-full">
+                                    {{ vendorpaymentdetails.business_name }}
+                                </td>
+
+                                <td class="px-6 py-4 text-left  text-gray-500  tracking-wider whitespace-nowrap w-full">
+                                    {{ vendorpaymentdetails.bank_name }}
+                                </td>
+                                <td class="px-6 py-4 text-left  text-gray-500  tracking-wider whitespace-nowrap w-full">
+                                    {{ vendorpaymentdetails.account_number }}
+                                </td>
+
+                                <td class="px-6 py-4 text-left  text-gray-500  tracking-wider whitespace-nowrap w-full">
+                                    {{ vendorpaymentdetails.account_name }}
+                                </td>
+                                <td class="px-6 py-4 text-left  text-gray-500  tracking-wider whitespace-nowrap w-full">
+                                    {{ vendorpaymentdetails.currency_code }}
+                                </td>
+                                <td class="px-6 py-4 text-left  text-gray-500  tracking-wider whitespace-nowrap w-full">
+                                    {{ vendorpaymentdetails.payment_method }}
+                                </td>
+
+
+                                <td class="px-6 py-4 text-left  text-gray-500  tracking-wider whitespace-nowrap w-full">
+                                    <a href="#" @click.stop="editModal(vendorpaymentdetails)"
+                                       class="font-medium text-blue-600 hover:underline">Edit</a> /
+                                    <a href="#" @click.stop="getId(vendorpaymentdetails)"
+                                       class="font-medium text-red-600 hover:underline">Delete</a>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+
+
+                        <!--                        Another Layout for Admin-->
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </AuthenticatedLayout>
+</template>

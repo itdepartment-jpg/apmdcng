@@ -1,0 +1,88 @@
+<script setup lang="ts">
+import { Head } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { DocumentIcon, PencilIcon } from '@heroicons/vue/24/outline';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+
+interface PressRelease {
+    id: number;
+    title: string;
+    summary: string;
+    content: string;
+    released_at: string;
+    pdf_path: string | null;
+    pdf_url: string | null;
+}
+
+interface Props {
+    pressRelease: PressRelease;
+    canEdit: boolean;
+}
+
+const props = defineProps<Props>();
+
+const formattedDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+};
+</script>
+
+<template>
+    <Head :title="pressRelease.title" />
+
+    <AuthenticatedLayout>
+        <template #header>
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold leading-tight text-gray-800">
+                    {{ pressRelease.title }}
+                </h2>
+                <div v-if="canEdit" class="flex space-x-2">
+                    <PrimaryButton
+                        :href="route('press-releases.edit', pressRelease.id)"
+                        class="flex items-center gap-2"
+                    >
+                        <PencilIcon class="h-5 w-5" />
+                        <span>Edit</span>
+                    </PrimaryButton>
+                </div>
+            </div>
+        </template>
+
+        <div class="py-6">
+            <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <!-- Metadata -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-6 border-b border-gray-200">
+                            <div class="text-sm text-gray-500">
+                                Released on {{ formattedDate(pressRelease.released_at) }}
+                            </div>
+                            <a
+                                v-if="pressRelease.pdf_url"
+                                :href="pressRelease.pdf_url"
+                                target="_blank"
+                                class="mt-3 sm:mt-0 inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700"
+                            >
+                                <DocumentIcon class="h-5 w-5 mr-2" />
+                                Download PDF
+                            </a>
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="prose prose-lg max-w-none mb-8">
+                            <p class="text-lg text-gray-700">
+                                {{ pressRelease.summary }}
+                            </p>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="prose prose-lg max-w-none" v-html="pressRelease.content" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>
