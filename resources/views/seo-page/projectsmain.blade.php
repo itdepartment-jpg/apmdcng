@@ -1042,6 +1042,7 @@
         // Initialize
         // initTable();
     </script>
+    @include('partials.whatsapp')
 </body>
 
 </html>

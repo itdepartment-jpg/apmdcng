@@ -577,6 +577,7 @@
         //     this.reset();
         // });
     </script>
+    @include('partials.whatsapp')
 </body>
 
 </html>

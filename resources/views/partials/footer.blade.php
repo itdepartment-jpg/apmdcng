@@ -115,6 +115,14 @@
                         </a>
                     </li>
                     <li>
+                        <a href="#"
+                            class="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group">
+                            <span
+                                class="w-1 h-1 bg-accent rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                            Our Blog
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('faq') }}"
                             class="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group">
                             <span

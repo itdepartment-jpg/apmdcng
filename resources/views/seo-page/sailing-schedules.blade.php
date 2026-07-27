@@ -361,5 +361,6 @@
             offset: 100
         });
     </script>
+    @include('partials.whatsapp')
 </body>
 </html>

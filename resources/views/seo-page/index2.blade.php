@@ -62,6 +62,317 @@
             background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
             background-size: 20px 20px;
         }
+
+                /*======================================
+WHY CHOOSE GROUPAGE
+======================================*/
+/*=========================
+WHY GROUPAGE
+==========================*/
+
+.why-groupage{
+   padding:90px 0 20px;
+    background:#f8fafc;
+}
+
+.section-tag{
+    color:#d62828;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:2px;
+}
+
+.section-title{
+    font-size:42px;
+    font-weight:700;
+    margin:15px 0;
+    color:#222;
+}
+
+.section-text{
+    max-width:760px;
+    margin:auto;
+    color:#666;
+}
+
+.groupage-box{
+    background:#fff;
+    border-radius:12px;
+    padding:40px 25px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    transition:.35s;
+    height:100%;
+}
+
+.groupage-box:hover{
+    transform:translateY(-8px);
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+.groupage-box i{
+    width:70px;
+    height:70px;
+    line-height:70px;
+    border-radius:50%;
+    background:#d62828;
+    color:#fff;
+    font-size:28px;
+    margin-bottom:20px;
+}
+
+.groupage-box h5{
+    font-weight:700;
+    margin-bottom:15px;
+}
+
+.groupage-box p{
+    color:#666;
+    margin:0;
+}
+
+/*======================================
+LATEST BLOG
+======================================*/
+
+.blog-section{
+    padding:100px 0;
+    background:#f8fafc;
+}
+
+.blog-card{
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    transition:.35s;
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+    height:100%;
+}
+
+.blog-card:hover{
+    transform:translateY(-10px);
+    box-shadow:0 25px 45px rgba(0,0,0,.15);
+}
+
+.blog-image{
+    position:relative;
+    overflow:hidden;
+    height:240px;
+}
+
+.blog-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:.5s;
+}
+
+.blog-card:hover img{
+    transform:scale(1.08);
+}
+
+.blog-category{
+    position:absolute;
+    top:18px;
+    left:18px;
+    background:#EA222F;
+    color:#fff;
+    padding:7px 14px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.blog-content{
+    padding:30px;
+}
+
+.blog-content h3{
+    font-size:24px;
+    font-weight:700;
+    margin-bottom:15px;
+    line-height:1.4;
+    color:#222;
+}
+
+.blog-content p{
+    color:#666;
+    margin-bottom:20px;
+}
+
+.blog-meta{
+    display:flex;
+    justify-content:space-between;
+    font-size:14px;
+    color:#999;
+    margin-bottom:20px;
+}
+
+.blog-link{
+    color:#303791;
+    font-weight:700;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.blog-link:hover{
+    color:#EA222F;
+}
+
+.testimonial-card{
+
+    background:#fff;
+    border-radius:24px;
+    padding:50px;
+    border:1px solid #edf2f7;
+    box-shadow:0 15px 40px rgba(0,0,0,.06);
+
+    transition:.35s;
+
+    height:100%;
+
+}
+
+.testimonial-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 25px 50px rgba(0,0,0,.10);
+
+}
+
+.testimonial-quote{
+
+    font-size:60px;
+
+    color:#EA222F20;
+
+    text-align:center;
+
+    margin-bottom:15px;
+
+}
+
+.testimonial-stars{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:4px;
+
+    color:#fbbf24;
+
+    margin-bottom:30px;
+
+}
+
+.testimonial-card blockquote{
+
+    font-size:20px;
+
+    line-height:1.9;
+
+    color:#555;
+
+    text-align:center;
+
+    font-style:italic;
+
+}
+
+.testimonial-divider{
+
+    width:90px;
+
+    height:4px;
+
+    background:linear-gradient(90deg,#303791,#EA222F);
+
+    margin:35px auto;
+
+    border-radius:20px;
+
+}
+
+.testimonial-client{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:20px;
+
+}
+
+.client-avatar{
+
+    width:72px;
+
+    height:72px;
+
+    border-radius:50%;
+
+    background:linear-gradient(135deg,#303791,#EA222F);
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    flex-shrink:0;
+
+}
+
+.client-details h4{
+
+    font-size:20px;
+
+    font-weight:700;
+
+    color:#222;
+
+    margin-bottom:3px;
+
+}
+
+.client-details p{
+
+    color:#777;
+
+    margin-bottom:2px;
+
+}
+
+.client-details span{
+
+    color:#303791;
+
+    font-weight:600;
+
+    display:block;
+
+    margin-bottom:8px;
+
+}
+
+.client-details small{
+
+    color:#16a34a;
+
+    font-weight:600;
+
+}
+
     </style>
 </head>
 
@@ -112,13 +423,13 @@
                     </div>
 
                     <h1 class="text-4xl sm:text-5xl 2xl:text-6xl font-bold leading-[2.5rem] mb-4">
-                        <span class="text-accent">Seamless Ship Agency & Logistics in Nigeria: </span> ISO-Certified
+                        <span class="text-accent">Nigeria's Leading Groupage & Consolidated Cargo Company: </span> ISO-Certified
                         Excellence
                     </h1>
 
                     <p class="text-xl text-gray-600 mb-8 max-w-2xl">
-                        Decades of trusted maritime support—from port clearance to complex offshore operations
-                        across Lagos, Onne, and beyond.
+                        Decades of trusted maritime support from port clearance to complex offshore operations
+                        across Lagos, Onne, and beyond and Save up to 70% on shipping costs with APMDC Groupage.
                     </p>
 
                     <div class="flex flex-col sm:flex-row gap-4">
@@ -337,6 +648,112 @@
             </div>
         </div>
     </section>
+
+    <!-- =========================
+     WHY CHOOSE GROUPAGE
+========================= -->
+<section class="why-groupage py-5">
+    <div class="container mx-auto px-6">
+
+        <!-- Section Header -->
+        <div class="text-center mb-5">
+            <span class="section-tag">WHY CHOOSE GROUPAGE</span>
+
+            <h2 class="section-title">
+                Cost-Effective Shipping Without Compromise
+            </h2>
+
+            <p class="section-text">
+                Our Groupage (Less-than-Container Load) service allows businesses to ship
+                smaller consignments efficiently by sharing container space. Enjoy reliable,
+                secure, and affordable international shipping without paying for an entire
+                container.
+            </p>
+        </div>
+
+        <!-- Benefits -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+            <div class="col-lg-3 col-md-6">
+                <div class="groupage-box">
+                    <i class="fas fa-wallet"></i>
+                    <h5>Pay Only for the Space You Use</h5>
+                    <p>Reduce shipping costs by paying only for the space your cargo occupies.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="groupage-box">
+                    <i class="fas fa-calendar-week"></i>
+                    <h5>Scheduled Weekly Departures</h5>
+                    <p>Consistent weekly sailings ensure your shipments move without unnecessary delays.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="groupage-box">
+                    <i class="fas fa-bolt"></i>
+                    <h5>Fast Cargo Consolidation</h5>
+                    <p>Efficient cargo consolidation helps shorten lead times and speeds up delivery.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="groupage-box">
+                    <i class="fas fa-truck"></i>
+                    <h5>Door-to-Door Delivery</h5>
+                    <p>From collection to final destination, we manage every stage of your shipment.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="groupage-box">
+                    <i class="fas fa-file-invoice"></i>
+                    <h5>Customs Clearance Support</h5>
+                    <p>Our experienced team handles customs documentation and clearance to ensure smooth transit.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="groupage-box">
+                    <i class="fas fa-shield-alt"></i>
+                    <h5>Cargo Protection</h5>
+                    <p>Optional cargo insurance provides added protection against unforeseen transit risks.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="groupage-box">
+                    <i class="fas fa-location-dot"></i>
+                    <h5>Real-Time Shipment Tracking</h5>
+                    <p>Monitor your shipment's progress from departure through to final delivery.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Call to Action -->
+        <div class="text-center mt-12">
+            <a href="{{ route('contact.show') }}" class="inline-block">
+                <button
+                    class="relative overflow-hidden group bg-accent text-white font-medium py-4 px-8 rounded-lg transition-all duration-300 hover:bg-[#d11a26] hover:shadow-lg">
+                    <span class="relative z-10">
+                        Request a Groupage Quote
+                    </span>
+                </button>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<div class="overflow-hidden">
+    <svg viewBox="0 0 1440 120" class="w-full h-auto">
+        <path fill="#ffffff"
+            d="M0,64L80,74.7C160,85,320,107,480,106.7C640,107,800,85,960,74.7C1120,64,1280,64,1360,64L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z">
+        </path>
+    </svg>
+</div>
 
     <!-- Services Section -->
 
@@ -637,7 +1054,7 @@
         data-aos="fade-up" data-aos-delay="250">
 
         <div class="h-1/2 overflow-hidden">
-            <img src="{{ asset('images/APMDC Groupage.png') }}" alt="Groupage Services"
+            <img src="{{ asset('images/APMDC Groupage Service.jpg') }}" alt="Groupage Services"
                 class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110">
         </div>
 
@@ -664,7 +1081,7 @@
         data-aos="fade-up" data-aos-delay="300">
 
         <div class="h-1/2 overflow-hidden">
-            <img src="{{ asset('images/APMDC Ship to Shore.png') }}" alt="Ship-to-Shore Operations"
+            <img src="{{ asset('images/ship 2 shore APMDC.jpg') }}" alt="Ship-to-Shore Operations"
                 class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110">
         </div>
 
@@ -690,7 +1107,7 @@
         data-aos="fade-up" data-aos-delay="350">
 
         <div class="h-1/2 overflow-hidden">
-            <img src="{{ asset('images/APMDC Warehouse.jpg') }}" alt="Warehousing & Inventory Management"
+            <img src="{{ asset('images/APMDC Warehousing Services.jpg') }}" alt="Warehousing & Inventory Management"
                 class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110">
         </div>
 
@@ -725,149 +1142,414 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="py-20 bg-white">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col lg:flex-row justify-between items-end mb-16">
-                <div class="mb-8 lg:mb-0 lg:w-1/2">
-                    <span class="text-accent font-semibold tracking-wider">CLIENT TESTIMONIALS</span>
-                    <h2 class="text-3xl md:text-4xl font-bold text-neutdrk mt-3">
-                        Proven Partnerships: Hear From Our Industry Leaders
-                    </h2>
-                </div>
-                <div class="lg:w-1/2">
-                    <p class="text-gray-600">
-                        Don't just take our word for it. Read how APMDC delivers operational certainty and efficiency
-                        for clients across the maritime and energy sectors.
-                    </p>
-                </div>
-            </div>
+     @include('partials.home.e-service')
 
-            <!-- Testimonial Slider -->
-            <div class="swiper testimonial-slider">
-                <div class="swiper-wrapper">
-                    <!-- Testimonial 1 -->
-                    <div class="swiper-slide">
-                        <div class="bg-[#FAFAFA] p-10 rounded-xl h-full">
-                            <div class="mb-6">
-                                <div>
-                                    <p class="font-semibold text-lg">M. Adebayo</p>
-                                    <p class="text-sm text-gray-500">Fleet Operations Manager, Global Tankers Inc.</p>
-                                </div>
-                            </div>
-                            <div class="flex mb-4">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                            </div>
-                            <blockquote class="text-lg italic text-gray-700">
-                                "APMDC's expertise in port documentation and clearance is unmatched. They cut our
-                                average vessel turnaround time by 18%, which has significantly improved our routing and
-                                revenue per call."
-                            </blockquote>
-                        </div>
-                    </div>
+<!-- =====================================================
+CLIENT TESTIMONIALS
+====================================================== -->
 
-                    <!-- Testimonial 2 -->
-                    <div class="swiper-slide">
-                        <div class="bg-[#FAFAFA] p-10 rounded-xl h-full">
-                            <div class="mb-6">
-                                <div>
-                                    <p class="font-semibold text-lg">D. Okoro</p>
-                                    <p class="text-sm text-gray-500">Marine Superintendent, Offshore Energy Solutions
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex mb-4">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                            </div>
-                            <blockquote class="text-lg italic text-gray-700">
-                                "For our recent rig move, APMDC managed the complex logistics, specialized customs, and
-                                crewing with flawless execution. Their planning ensured zero downtime and full
-                                regulatory compliance."
-                            </blockquote>
-                        </div>
-                    </div>
+<section class="py-24 bg-gradient-to-br from-[#f8fafc] via-white to-[#f4f7fb]">
 
-                    <!-- Testimonial 3 -->
-                    <div class="swiper-slide">
-                        <div class="bg-[#FAFAFA] p-10 rounded-xl h-full">
-                            <div class="mb-6">
-                                <div>
-                                    <p class="font-semibold text-lg">S. Johnson</p>
-                                    <p class="text-sm text-gray-500">Supply Chain Director, African Trade Corp</p>
-                                </div>
-                            </div>
-                            <div class="flex mb-4">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                            </div>
-                            <blockquote class="text-lg italic text-gray-700">
-                                "We rely on APMDC's warehouse facilities and distribution network for our regional
-                                supply chain. Their inventory transparency and on-time delivery have reduced our storage
-                                costs by 25%."
-                            </blockquote>
-                        </div>
-                    </div>
+    <div class="container mx-auto px-6">
 
-                    <!-- Testimonial 4 -->
-                    <div class="swiper-slide">
-                        <div class="bg-[#FAFAFA] p-10 rounded-xl h-full">
-                            <div class="mb-6">
-                                <div>
-                                    <p class="font-semibold text-lg">T. Green</p>
-                                    <p class="text-sm text-gray-500">Logistics Procurement Lead, International Shipping
-                                        Lines</p>
-                                </div>
-                            </div>
-                            <div class="flex mb-4">
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                                <i class="fas fa-star text-yellow-400"></i>
-                            </div>
-                            <blockquote class="text-lg italic text-gray-700">
-                                "When operating in Nigerian waters, compliance is non-negotiable. APMDC serves as our
-                                vital shield, ensuring every process meets local and international standards. Absolute
-                                peace of mind."
-                            </blockquote>
-                        </div>
-                    </div>
-                </div>
+        <!-- ==========================
+        Section Header
+        =========================== -->
 
-                <!-- Slider Pagination -->
-                <div class="swiper-pagination mt-8"></div>
+        <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
 
-                <!-- Slider Navigation -->
-                <div
-                    class="swiper-button-next hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-md hover:bg-accent hover:text-white transition-colors duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M9 18l6-6-6-6" />
-                    </svg>
-                </div>
-                <div
-                    class="swiper-button-prev hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-md hover:bg-accent hover:text-white transition-colors duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M15 18l-6-6 6-6" />
-                    </svg>
-                </div>
-            </div>
+            <span class="text-accent font-semibold tracking-wider uppercase">
+                CLIENT TESTIMONIALS
+            </span>
+
+            <h2 class="text-3xl md:text-4xl font-bold text-neutdrk mt-3 mb-6">
+                Trusted by Businesses Across Nigeria's Maritime Industry
+            </h2>
+
+            <p class="text-lg text-gray-600">
+                We build long-term partnerships by delivering reliable logistics,
+                customs clearance, offshore support and supply chain solutions
+                that businesses can depend on.
+            </p>
+
         </div>
-    </section>
+
+        <!-- ==========================
+        Testimonial Slider
+        =========================== -->
+
+        <div class="swiper testimonial-slider">
+
+            <div class="swiper-wrapper">
+
+                <!-- ==========================
+                Testimonial 1
+                =========================== -->
+
+                <div class="swiper-slide">
+
+                    <div class="testimonial-card">
+
+                        <div class="testimonial-quote">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+
+                        <div class="testimonial-stars">
+
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+
+                        </div>
+
+                        <blockquote>
+
+                            APMDC's expertise in vessel documentation and
+                            customs clearance significantly reduced our port
+                            turnaround time. Their professionalism and
+                            responsiveness make them an invaluable logistics
+                            partner.
+
+                        </blockquote>
+
+                        <div class="testimonial-divider"></div>
+
+                        <div class="testimonial-client">
+
+                            <div class="client-avatar">
+
+                                MA
+
+                            </div>
+
+                            <div class="client-details">
+
+                                <h4>M. Adebayo</h4>
+
+                                <p>Fleet Operations Manager</p>
+
+                                <span>Global Tankers Inc.</span>
+
+                                <small>
+
+                                    <i class="fas fa-circle-check"></i>
+
+                                    Verified Client
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ==========================
+                Testimonial 2
+                =========================== -->
+
+                <div class="swiper-slide">
+
+                    <div class="testimonial-card">
+
+                        <div class="testimonial-quote">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+
+                        <div class="testimonial-stars">
+
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+
+                        </div>
+
+                        <blockquote>
+
+                            The APMDC team coordinated our offshore operations
+                            seamlessly. Communication was excellent, timelines
+                            were met and every regulatory requirement was handled
+                            professionally.
+
+                        </blockquote>
+
+                        <div class="testimonial-divider"></div>
+
+                        <div class="testimonial-client">
+
+                            <div class="client-avatar">
+
+                                DO
+
+                            </div>
+
+                            <div class="client-details">
+
+                                <h4>D. Okoro</h4>
+
+                                <p>Marine Superintendent</p>
+
+                                <span>Offshore Energy Solutions</span>
+
+                                <small>
+
+                                    <i class="fas fa-circle-check"></i>
+
+                                    Verified Client
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ==========================
+                Testimonial 3
+                =========================== -->
+
+                <div class="swiper-slide">
+
+                    <div class="testimonial-card">
+
+                        <div class="testimonial-quote">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+
+                        <div class="testimonial-stars">
+
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+
+                        </div>
+
+                        <blockquote>
+
+                            From warehousing to nationwide distribution,
+                            APMDC continues to deliver dependable logistics
+                            services that have strengthened our supply chain.
+
+                        </blockquote>
+
+                        <div class="testimonial-divider"></div>
+
+                        <div class="testimonial-client">
+
+                            <div class="client-avatar">
+
+                                SJ
+
+                            </div>
+
+                            <div class="client-details">
+
+                                <h4>S. Johnson</h4>
+
+                                <p>Supply Chain Director</p>
+
+                                <span>African Trade Corp.</span>
+
+                                <small>
+
+                                    <i class="fas fa-circle-check"></i>
+
+                                    Verified Client
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Pagination -->
+
+            <div class="swiper-pagination mt-12"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ==========================
+LATEST INSIGHTS
+========================== -->
+
+<section class="blog-section">
+
+    <div class="container mx-auto px-6">
+
+        <div class="text-center mb-16">
+
+            <span class="section-tag">
+                LATEST INSIGHTS
+            </span>
+
+            <h2 class="section-title">
+                Logistics Tips & Industry Insights
+            </h2>
+
+            <p class="section-text">
+                Stay informed with practical shipping advice, customs updates,
+                freight forwarding tips and logistics best practices from the
+                APMDC team.
+            </p>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <!-- Article 1 -->
+
+            <div class="blog-card">
+
+                <div class="blog-image">
+
+                    <img src="{{ asset('images/APMDC Groupage Service.jpg') }}" alt="Groupage Shipping">
+
+                    <span class="blog-category">
+                        GROUPAGE
+                    </span>
+
+                </div>
+
+                <div class="blog-content">
+
+                    <div class="blog-meta">
+                        <span>July 2026</span>
+                        <span>5 min read</span>
+                    </div>
+
+                    <h3>
+                        Everything You Need to Know About Groupage Shipping
+                    </h3>
+
+                    <p>
+                        Learn how consolidated cargo helps businesses reduce
+                        shipping costs while enjoying reliable weekly departures
+                        and faster international delivery.
+                    </p>
+
+                    <a href="#" class="blog-link">
+                        Read Article →
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- Article 2 -->
+
+            <div class="blog-card">
+
+                <div class="blog-image">
+
+                    <img src="{{ asset('images/ap2.jpg') }}" alt="Customs Clearance">
+
+                    <span class="blog-category">
+                        CUSTOMS
+                    </span>
+
+                </div>
+
+                <div class="blog-content">
+
+                    <div class="blog-meta">
+                        <span>July 2026</span>
+                        <span>6 min read</span>
+                    </div>
+
+                    <h3>
+                        Understanding Customs Clearance in Nigeria
+                    </h3>
+
+                    <p>
+                        Discover the documentation, compliance requirements and
+                        customs procedures that ensure your cargo clears Nigerian
+                        ports without unnecessary delays.
+                    </p>
+
+                    <a href="#" class="blog-link">
+                        Read Article →
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- Article 3 -->
+
+            <div class="blog-card">
+
+                <div class="blog-image">
+
+                    <img src="{{ asset('images/APMDC Warehousing Services.jpg') }}" alt="Shipping Costs">
+
+                    <span class="blog-category">
+                        LOGISTICS
+                    </span>
+
+                </div>
+
+                <div class="blog-content">
+
+                    <div class="blog-meta">
+                        <span>July 2026</span>
+                        <span>4 min read</span>
+                    </div>
+
+                    <h3>
+                        7 Practical Ways to Reduce International Shipping Costs
+                    </h3>
+
+                    <p>
+                        From choosing the right freight option to consolidating
+                        shipments, explore proven strategies that save your
+                        business money.
+                    </p>
+
+                    <a href="#" class="blog-link">
+                        Read Article →
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="text-center mt-16">
+
+            <a href="#"
+                class="inline-block bg-[#EA222F] hover:bg-[#d11a26] text-white font-semibold px-8 py-4 rounded-lg transition">
+
+                View All Articles
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
 
     @php
         $homepageFaqs = [
@@ -1030,44 +1712,31 @@
         });
 
         // Initialize Testimonial Slider
-        const testimonialSwiper = new Swiper('.testimonial-slider', {
-            loop: true,
-            autoplay: {
-                delay: 5000,
-                disableOnInteraction: false,
-            },
-            speed: 800,
-            grabCursor: true,
-            spaceBetween: 30,
-            slidesPerView: 1,
-            centeredSlides: true,
-            effect: 'coverflow',
-            coverflowEffect: {
-                rotate: 0,
-                stretch: 0,
-                depth: 100,
-                modifier: 2.5,
-                slideShadows: false,
-            },
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-                dynamicBullets: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            breakpoints: {
-                768: {
-                    slidesPerView: 1.2,
-                },
-                1024: {
-                    slidesPerView: 1.5,
-                }
-            }
-        });
+        const testimonialSwiper = new Swiper(".testimonial-slider",{
+
+    loop:true,
+
+    speed:700,
+
+    autoplay:{
+        delay:5000,
+        disableOnInteraction:false,
+    },
+
+    slidesPerView:1,
+
+    spaceBetween:30,
+
+    pagination:{
+        el:".swiper-pagination",
+        clickable:true,
+    }
+
+});
     </script>
+
+     @include('partials.whatsapp')
+     
 </body>
 
 </html>
