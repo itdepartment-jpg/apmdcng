@@ -28,7 +28,7 @@
         <!-- Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-            <!-- Sailing Schedule -->
+            <!-- E-Service Portal -->
             <div class="bg-white rounded-2xl shadow-lg p-8 hover:-translate-y-2 hover:shadow-2xl transition duration-300">
 
                 <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-6">
@@ -36,14 +36,14 @@
                 </div>
 
                 <h3 class="text-xl font-bold text-gray-900 mb-3">
-                    Sailing Schedule
+                    E-Service Portal
                 </h3>
 
                 <p class="text-gray-600 mb-6">
-                    View vessel arrival and departure schedules in real time.
+                    Track shipments, generate invoices, request quotations, manage documents, and access APMDC's online logistics services anytime, anywhere.
                 </p>
 
-                <a href="#" class="font-semibold text-red-600 hover:text-red-700">
+                <a href="https://enterprise.apmdcng.net/" class="font-semibold text-red-600 hover:text-red-700">
                     Learn More →
                 </a>
 
