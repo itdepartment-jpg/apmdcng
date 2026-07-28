@@ -10,7 +10,7 @@
                             <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
                         </svg>
                     </button>
-                    <a href="" class="flex ms-2 md:me-24">
+                    <a href="/dashboard" class="flex ms-2 md:me-24">
                         <div class="flex items-center">
                             <img src="/images/APMDC-Logo.png" alt="APMDC Logo" class="h-8 w-auto mr-3">
                             <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-white font-poppins">
@@ -63,14 +63,455 @@
     </nav>
 
     <!-- APMDC-themed Sidebar -->
-    <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-gradient-to-b from-[#303791] to-[#1a1f5c] border-r border-[#EA222F]/30 sm:translate-x-0 shadow-xl" aria-label="Sidebar">
+    <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-80 h-screen pt-20 transition-transform -translate-x-full bg-gradient-to-b from-[#303791] to-[#1a1f5c] border-r border-[#EA222F]/30 sm:translate-x-0 shadow-xl" aria-label="Sidebar">
         <div class="h-full px-3 pb-4 overflow-y-auto">
             <div class="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
-                <p class="text-xs text-white/70 mb-1">Maritime Operations</p>
-                <p class="text-sm text-white font-medium">Management System</p>
+                <p class="text-xs text-white/70 uppercase tracking-wider mb-1">
+                    Administration
+                </p>
+
+                <h3 class="text-white text-base font-semibold">
+                    Control Panel
+                </h3>
+
+                <p class="text-xs text-white/60 mt-2 leading-relaxed">
+                    Manage website content, shipments, blog, projects and users.
+                </p>
             </div>
 
-            <ul class="space-y-2 font-medium">
+            <!-- Dashboard -->
+            <li>
+                <Link
+                    :href="route('dashboard')"
+                    :class="[
+                        'flex items-center p-3 rounded-lg group font-medium transition-all duration-200',
+                        currentRoute === '/dashboard'
+                            ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                            : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white hover:shadow-md'
+                    ]"
+                >
+                    <svg
+                        class="w-5 h-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M3 13h8V3H3z"/>
+                        <path d="M13 21h8V11h-8z"/>
+                        <path d="M13 3h8v6h-8z"/>
+                        <path d="M3 21h8v-6H3z"/>
+                    </svg>
+
+                    <span class="ms-3">
+                        Dashboard
+                    </span>
+                </Link>
+            </li>
+
+           <!-- =========================================
+                SHIPMENT MANAGEMENT
+            ========================================= -->
+
+            <li
+                @click="toggleMenu('shipment')"
+                class="mt-5 mb-2 cursor-pointer"
+            >
+                <div class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 hover:text-white transition-colors">
+
+                    <span>Shipment Management</span>
+
+                    <svg
+                        class="w-4 h-4 transition-transform duration-300"
+                        :class="{ 'rotate-180': openMenu === 'shipment' }"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7"
+                        />
+                    </svg>
+
+                </div>
+            </li>
+
+            <!-- Shipment Menu -->
+            <div
+                v-show="openMenu === 'shipment'"
+                class="space-y-1 overflow-hidden transition-all duration-300"
+            >
+
+                <!-- All Shipments -->
+                <li>
+                    <Link
+                        :href="'#'"
+                        :class="[
+                            'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                            currentRoute.includes('/shipments') &&
+                            !currentRoute.includes('/create') &&
+                            !currentRoute.includes('/track')
+                                ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                        ]"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M3 7l9-4 9 4-9 4-9-4zm0 0v10l9 4 9-4V7"
+                            />
+                        </svg>
+
+                        <span class="ms-3">
+                            All Shipments
+                        </span>
+                    </Link>
+                </li>
+
+                <!-- Add Shipment -->
+                <li>
+                    <Link
+                        :href="'#'"
+                        :class="[
+                            'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                            currentRoute.includes('/shipments/create')
+                                ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                        ]"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 5v14m7-7H5"
+                            />
+                        </svg>
+
+                        <span class="ms-3">
+                            Add Shipment
+                        </span>
+                    </Link>
+                </li>
+
+                <!-- Track Shipment -->
+                <li>
+                    <Link
+                        :href="'#'"
+                        :class="[
+                            'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                            currentRoute.includes('/track-shipment')
+                                ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                        ]"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="11" cy="11" r="7" />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M21 21l-4.35-4.35"
+                            />
+                        </svg>
+
+                        <span class="ms-3">
+                            Track Shipment
+                        </span>
+                    </Link>
+                </li>
+
+                <!-- Divider -->
+                <li class="my-4 border-t border-white/10"></li>
+
+            </div>
+            <!-- Divider -->
+            <li class="my-4 border-t border-white/10"></li>
+
+           
+            <!-- =========================================
+                BLOG MANAGEMENT
+            ========================================= -->
+
+            <li
+                @click="toggleMenu('blog')"
+                class="mt-5 mb-2 cursor-pointer"
+            >
+                <div class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 hover:text-white transition-colors">
+
+                    <span>Blog Management</span>
+
+                    <svg
+                        class="w-4 h-4 transition-transform duration-300"
+                        :class="{ 'rotate-180': openMenu === 'blog' }"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7"
+                        />
+                    </svg>
+
+                </div>
+            </li>
+
+            <!-- Blog Menu -->
+            <div
+                v-show="openMenu === 'blog'"
+                class="space-y-1 overflow-hidden transition-all duration-300"
+            >
+
+                <!-- Blog Posts -->
+                <li>
+                    <Link
+                        :href="'#'"
+                        :class="[
+                            'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                            currentRoute.includes('/blog') &&
+                            !currentRoute.includes('/categories') &&
+                            !currentRoute.includes('/create')
+                                ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                        ]"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M19 5H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2z"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M7 9h10M7 13h6"
+                            />
+                        </svg>
+
+                        <span class="ms-3">
+                            Blog Posts
+                        </span>
+                    </Link>
+                </li>
+
+                <!-- Categories -->
+                <li>
+                    <Link
+                        :href="'#'"
+                        :class="[
+                            'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                            currentRoute.includes('/blog/categories')
+                                ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                        ]"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M4 7h16M4 12h16M4 17h16"
+                            />
+                        </svg>
+
+                        <span class="ms-3">
+                            Categories
+                        </span>
+                    </Link>
+                </li>
+
+                <!-- Add New Post -->
+                <li>
+                    <Link
+                        :href="'#'"
+                        :class="[
+                            'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                            currentRoute.includes('/blog/create')
+                                ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                        ]"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 5v14m7-7H5"
+                            />
+                        </svg>
+
+                        <span class="ms-3">
+                            Add New Post
+                        </span>
+                    </Link>
+                </li>
+
+                <!-- Divider -->
+                <li class="my-4 border-t border-white/10"></li>
+
+        </div>
+                <!-- Divider -->
+                <li class="my-4 border-t border-white/10"></li>
+
+
+            <!-- =========================================
+                LEADERSHIP MANAGEMENT
+            ========================================= -->
+
+            <li
+                @click="toggleMenu('leadership')"
+                class="mt-5 mb-2 cursor-pointer"
+            >
+                <div class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 hover:text-white transition-colors">
+
+                    <span>Leadership Management</span>
+
+                    <svg
+                        class="w-4 h-4 transition-transform duration-300"
+                        :class="{ 'rotate-180': openMenu === 'leadership' }"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7"
+                        />
+                    </svg>
+
+                </div>
+            </li>
+
+            <!-- Leadership Menu -->
+            <div
+                v-show="openMenu === 'leadership'"
+                class="space-y-1 overflow-hidden transition-all duration-300"
+            >
+
+                <!-- All Leaders -->
+                <li>
+                    <Link
+                        :href="'#'"
+                        :class="[
+                            'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                            currentRoute.includes('/leadership') &&
+                            !currentRoute.includes('/create')
+                                ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                        ]"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-8 0v2m8 0H9m4-10a2 2 0 11-4 0 2 2 0 014 0z"
+                            />
+                        </svg>
+
+                        <span class="ms-3">
+                            All Leaders
+                        </span>
+                    </Link>
+                </li>
+
+                <!-- Add Leader -->
+                <li>
+                    <Link
+                        :href="'#'"
+                        :class="[
+                            'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                            currentRoute.includes('/leadership/create')
+                                ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                        ]"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 5v14m7-7H5"
+                            />
+                        </svg>
+
+                        <span class="ms-3">
+                            Add Leader
+                        </span>
+                    </Link>
+                </li>
+
+                <!-- Divider -->
+                <li class="my-4 border-t border-white/10"></li>
+
+            </div>
+            <!-- Divider -->
+            <li class="my-4 border-t border-white/10"></li>
+
+            <!-- <ul class="space-y-2 font-medium">
                 <li v-if="canEditLeadership">
                     <Link
                         :href="route('leadership.index')"
@@ -87,11 +528,12 @@
                         <span class="ms-3">Leadership</span>
                     </Link>
                 </li>
+            </ul> -->
 
-                <li v-if="canManageClientProjects">
+                <!-- <li v-if="canManageClientProjects">
                     <Link
                         :href="route('client-project-details.index')"
-                        :class="[
+                        :class="["
                             'flex items-center p-3 rounded-lg group font-medium transition-all duration-200',
                             currentRoute.includes('/client-project-details')
                                 ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
@@ -103,9 +545,9 @@
                         </svg>
                         <span class="ms-3">Vessel Projects</span>
                     </Link>
-                </li>
+                </li> -->
 
-                <li v-if="canManageNews">
+                <!-- <li v-if="canManageNews">
                     <Link
                         :href="route('news.index')"
                         :class="[
@@ -120,9 +562,227 @@
                         </svg>
                         <span class="ms-3">Maritime News</span>
                     </Link>
+                </li> -->
+
+            <!-- =========================================
+                USER MANAGEMENT
+            ========================================= -->
+
+                <li
+                    @click="toggleMenu('users')"
+                    class="mt-5 mb-2 cursor-pointer"
+                >
+                    <div class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 hover:text-white transition-colors">
+
+                        <span>User Management</span>
+
+                        <svg
+                            class="w-4 h-4 transition-transform duration-300"
+                            :class="{ 'rotate-180': openMenu === 'users' }"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+
+                    </div>
                 </li>
 
-                <li v-if="canViewUsers">
+                <!-- User Management Menu -->
+                <div
+                    v-show="openMenu === 'users'"
+                    class="space-y-1 overflow-hidden transition-all duration-300"
+                >
+
+                    <!-- Users -->
+                    <li>
+                        <Link
+                            :href="'#'"
+                            :class="[
+                                'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                                currentRoute.includes('/users') &&
+                                !currentRoute.includes('/roles')
+                                    ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                    : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                            ]"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-8 0v2m8 0H9m4-10a2 2 0 11-4 0 2 2 0 014 0z"
+                                />
+                            </svg>
+
+                            <span class="ms-3">
+                                Users
+                            </span>
+                        </Link>
+                    </li>
+
+                    <!-- Roles & Permissions -->
+                    <li>
+                        <Link
+                            :href="'#'"
+                            :class="[
+                                'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                                currentRoute.includes('/roles')
+                                    ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                    : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                            ]"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M9 12l2 2 4-4m5-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                            </svg>
+
+                            <span class="ms-3">
+                                Roles & Permissions
+                            </span>
+                        </Link>
+                    </li>
+
+                    <!-- Divider -->
+                    <li class="my-4 border-t border-white/10"></li>
+
+                </div>
+                <!-- Divider -->
+                <li class="my-4 border-t border-white/10"></li>
+
+                <!-- =========================================
+                    PROJECT MANAGEMENT
+                ========================================= -->
+
+                <li
+                    @click="toggleMenu('projects')"
+                    class="mt-5 mb-2 cursor-pointer"
+                >
+                    <div class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 hover:text-white transition-colors">
+
+                        <span>Project Management</span>
+
+                        <svg
+                            class="w-4 h-4 transition-transform duration-300"
+                            :class="{ 'rotate-180': openMenu === 'projects' }"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+
+                    </div>
+                </li>
+
+                <!-- Project Management Menu -->
+                <div
+                    v-show="openMenu === 'projects'"
+                    class="space-y-1 overflow-hidden transition-all duration-300"
+                >
+
+                    <!-- Projects -->
+                    <li>
+                        <Link
+                            :href="'#'"
+                            :class="[
+                                'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                                currentRoute.includes('/projects') &&
+                                !currentRoute.includes('/categories')
+                                    ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                    : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                            ]"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M3 7h18M3 12h18M3 17h18"
+                                />
+                            </svg>
+
+                            <span class="ms-3">
+                                Projects
+                            </span>
+                        </Link>
+                    </li>
+
+                    <!-- Project Categories -->
+                    <li>
+                        <Link
+                            :href="'#'"
+                            :class="[
+                                'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                                currentRoute.includes('/project-categories')
+                                    ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                    : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                            ]"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M4 7h16M4 12h16M4 17h16"
+                                />
+                            </svg>
+
+                            <span class="ms-3">
+                                Project Categories
+                            </span>
+                        </Link>
+                    </li>
+
+                    <!-- Divider -->
+                    <li class="my-4 border-t border-white/10"></li>
+
+                </div>
+                <!-- Divider -->
+                <li class="my-4 border-t border-white/10"></li>
+
+                <!-- <li v-if="canViewUsers">
                     <Link
                         :href="route('admin.users.index')"
                         :class="[
@@ -137,28 +797,10 @@
                         </svg>
                         <span class="ms-3">Team Members</span>
                     </Link>
-                </li>
+                </li> -->
 
-                <li>
-                    <Link
-                        :href="route('admin.profile.index')"
-                        :class="[
-                            'flex items-center p-3 rounded-lg group font-medium transition-all duration-200',
-                            currentRoute.includes('/profile')
-                                ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
-                                : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white hover:shadow-md'
-                        ]"
-                    >
-                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4s-4 1.79-4 4s1.79 4 4 4m0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4"/>
-                        </svg>
-                        <span class="ms-3">My Profile</span>
-                    </Link>
-                </li>
-
-
-
-                <li v-if="canManageProjects">
+                
+                <!-- <li v-if="canManageProjects">
                     <Link
                         :href="route('projects.index')"
                         :class="[
@@ -173,9 +815,9 @@
                         </svg>
                         <span class="ms-3">Projects</span>
                     </Link>
-                </li>
+                </li> -->
 
-                <li v-if="canManageProjectCategories">
+                <!-- <li v-if="canManageProjectCategories">
                     <Link
                         :href="route('categories.index')"
                         :class="[
@@ -190,7 +832,155 @@
                         </svg>
                         <span class="ms-3">Project Categories</span>
                     </Link>
+                </li> -->
+
+                <!-- =========================================
+                    COMMUNICATION
+                ========================================= -->
+
+                <li
+                    @click="toggleMenu('communication')"
+                    class="mt-5 mb-2 cursor-pointer"
+                >
+                    <div class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 hover:text-white transition-colors">
+
+                        <span>Communication</span>
+
+                        <svg
+                            class="w-4 h-4 transition-transform duration-300"
+                            :class="{ 'rotate-180': openMenu === 'communication' }"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+
+                    </div>
                 </li>
+
+                <!-- Communication Menu -->
+                <div
+                    v-show="openMenu === 'communication'"
+                    class="space-y-1 overflow-hidden transition-all duration-300"
+                >
+
+                    <!-- Notes -->
+                    <li>
+                        <Link
+                            :href="'#'"
+                            :class="[
+                                'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                                currentRoute.includes('/notes')
+                                    ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                    : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                            ]"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z"
+                                />
+                            </svg>
+
+                            <span class="ms-3">
+                                Notes
+                            </span>
+                        </Link>
+                    </li>
+
+                    <!-- Divider -->
+                    <li class="my-4 border-t border-white/10"></li>
+                </div>
+
+                <!-- =========================================
+     ADMINISTRATION
+========================================= -->
+
+<li
+    @click="toggleMenu('administration')"
+    class="mt-5 mb-2 cursor-pointer"
+>
+    <div class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 hover:text-white transition-colors">
+
+        <span>Administration</span>
+
+        <svg
+            class="w-4 h-4 transition-transform duration-300"
+            :class="{ 'rotate-180': openMenu === 'administration' }"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+            />
+        </svg>
+
+    </div>
+</li>
+
+<!-- Administration Menu -->
+<div
+    v-show="openMenu === 'administration'"
+    class="space-y-1 overflow-hidden transition-all duration-300"
+>
+
+    <!-- System Settings -->
+    <li>
+        <Link
+            :href="'#'"
+            :class="[
+                'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                currentRoute.includes('/settings')
+                    ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                    : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+            ]"
+        >
+            <svg
+                class="w-5 h-5"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M10.325 4.317a1 1 0 011.35-.936l.94.47a1 1 0 001.09-.217l.665-.665a1 1 0 011.414 0l1.414 1.414a1 1 0 010 1.414l-.665.665a1 1 0 00-.217 1.09l.47.94a1 1 0 01-.936 1.35h-.94a1 1 0 00-.949.684l-.314.942a1 1 0 01-.949.684h-2a1 1 0 01-.949-.684l-.314-.942A1 1 0 0010.94 9h-.94a1 1 0 01-.936-1.35l.47-.94a1 1 0 00-.217-1.09l-.665-.665a1 1 0 010-1.414L10.066 2.1a1 1 0 011.414 0l.665.665a1 1 0 001.09.217l.94-.47z"
+            />
+                <circle cx="12" cy="12" r="3" />
+            </svg>
+
+            <span class="ms-3">
+                System Settings
+            </span>
+        </Link>
+    </li>
+
+    <!-- Divider -->
+    <li class="my-4 border-t border-white/10"></li>
+
+</div>
 
                 <li v-if="canManageRoles">
                     <Link
@@ -226,6 +1016,141 @@
                     </Link>
                 </li>
 
+                <!-- =========================================
+                    ACCOUNT
+                ========================================= -->
+
+                <li
+                    @click="toggleMenu('account')"
+                    class="mt-5 mb-2 cursor-pointer"
+                >
+                    <div class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 hover:text-white transition-colors">
+
+                        <span>Account</span>
+
+                        <svg
+                            class="w-4 h-4 transition-transform duration-300"
+                            :class="{ 'rotate-180': openMenu === 'account' }"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+
+                    </div>
+                </li>
+
+                <!-- Account Menu -->
+                <div
+                    v-show="openMenu === 'account'"
+                    class="space-y-1 overflow-hidden transition-all duration-300"
+                >
+
+                    <!-- My Profile -->
+                    <li>
+                        <Link
+                            :href="'#'"
+                            :class="[
+                                'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                                currentRoute.includes('/profile')
+                                    ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                    : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                            ]"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M5.121 17.804A9 9 0 1118.879 17.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                            </svg>
+
+                            <span class="ms-3">
+                                My Profile
+                            </span>
+                        </Link>
+                    </li>
+
+                    <!-- Change Password -->
+                    <li>
+                        <Link
+                            :href="'#'"
+                            :class="[
+                                'flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200',
+                                currentRoute.includes('/change-password')
+                                    ? 'text-white bg-[#EA222F]/20 border-l-4 border-[#EA222F] shadow-lg'
+                                    : 'text-white/80 hover:bg-[#EA222F]/10 hover:text-white'
+                            ]"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2h-1V9a5 5 0 00-10 0v2H6a2 2 0 00-2 2v6a2 2 0 002 2zm3-10V9a3 3 0 016 0v2H9z"
+                                />
+                            </svg>
+
+                            <span class="ms-3">
+                                Change Password
+                            </span>
+                        </Link>
+                    </li>
+
+                    <!-- Logout -->
+                    <li>
+                        <Link
+                            :href="route('logout')"
+                            method="post"
+                            as="button"
+                            class="flex items-center w-full pl-8 pr-3 py-3 rounded-lg group font-medium text-white/80 hover:bg-red-600/20 hover:text-red-300 transition-all duration-200"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1"
+                                />
+                            </svg>
+
+                            <span class="ms-3">
+                                Logout
+                            </span>
+                        </Link>
+                    </li>
+
+                    <!-- Divider -->
+                    <li class="my-4 border-t border-white/10"></li>
+
+                </div>
+
                 <!-- Additional Maritime Sections -->
                 <!-- <li v-if="isSpecialUser">
                     <Link
@@ -260,7 +1185,6 @@
                         <span class="ms-3">Port Reports</span>
                     </Link>
                 </li> -->
-            </ul>
 
             <!-- Sidebar Footer -->
             <div class="mt-8 pt-6 border-t border-white/10">
@@ -282,16 +1206,58 @@
     </aside>
 
     <!-- Main Content Area with APMDC Background -->
-    <div class="p-4 sm:ml-64 mt-14 min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30">
-        <!-- Page Header -->
-        <div class="mb-6">
-            <h1 class="text-2xl font-bold text-[#303791] font-poppins">
-                Maritime Management Dashboard
-            </h1>
-            <p class="text-gray-600 mt-1">
-                Comprehensive vessel operations and logistics management
-            </p>
-        </div>
+    <div class="px-8 py-8 sm:ml-80 mt-16 min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50/20">
+        <!-- =========================================
+     PAGE HEADER
+========================================= -->
+<div class="mb-10">
+
+    <!-- Breadcrumb -->
+    <nav class="flex items-center text-sm text-slate-500 mb-3">
+        <span>Home</span>
+
+        <svg
+            class="w-4 h-4 mx-2"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+            />
+        </svg>
+
+        <span class="font-semibold text-[#EA222F]">
+            Dashboard
+        </span>
+    </nav>
+
+    <h1 class="text-4xl font-bold text-slate-900">
+        Dashboard
+    </h1>
+
+    <p class="mt-2 text-lg text-slate-500">
+        Welcome back,
+        <span class="font-semibold text-[#EA222F]">
+            {{ page.props.auth.user.name }}
+        </span>
+        👋
+    </p>
+
+     <p class="text-sm text-slate-400 mt-1">
+                        {{ new Date().toLocaleDateString('en-GB', {
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                        }) }}
+    </p>
+
+</div>
 
         <!-- Page Content -->
         <main class="bg-white rounded-xl shadow-sm border border-gray-200/50 p-6">
@@ -301,7 +1267,7 @@
         <!-- Footer -->
         <div class="mt-6 text-center">
             <p class="text-xs text-gray-500">
-                © 2024 APMDC - Premium Ship Agency & Logistics Services
+                © 2026 APMDC - Premium Ship Agency & Logistics Services
             </p>
         </div>
     </div>
@@ -332,6 +1298,14 @@ type AuthUser = {
     isSuperAdmin?: boolean
     can?: Record<string, boolean>
 }
+
+import { ref } from "vue";
+
+const openMenu = ref("shipment"); // Shipment open by default
+
+const toggleMenu = (menu) => {
+    openMenu.value = openMenu.value === menu ? null : menu;
+};
 
 // initialize components based on data attribute selectors
 onMounted(() => {
