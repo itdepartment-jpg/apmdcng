@@ -12,6 +12,9 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RolePermissionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Admin\ShipmentController;
+use App\Http\Controllers\Admin\PartnerController;
+use App\Http\Controllers\Admin\CarrierController;
 
 // Route::get('/', function () {
 //    return Inertia::render('Welcome', [
@@ -245,6 +248,11 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::delete('/users/{user}', [UserController::class, 'destroy'])
         ->name('admin.users.destroy')
         ->middleware('can:delete users');
+
+    Route::resource('shipments', ShipmentController::class);
+    Route::resource('partners', PartnerController::class);
+    Route::resource('carriers', CarrierController::class);
+
 });
 
 // Profile
