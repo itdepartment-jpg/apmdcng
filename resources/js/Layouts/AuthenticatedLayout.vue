@@ -495,9 +495,9 @@ type AuthUser = {
 // ===============================
 // Sidebar Menu States
 // ===============================
-const openMenu = ref("shipment"); // Main menu
+const openMenu = ref<string | null>("shipment"); // Main menu
 
-const openSubMenu = ref("shipments"); // Default open submenu
+const openSubMenu = ref<string | null>("shipments"); // Default submenu
 
 // Toggle Main Menu
 const toggleMenu = (menu: string) => {
@@ -511,8 +511,11 @@ const toggleMenu = (menu: string) => {
 
 // Toggle Shipment / Partner / Carrier
 const toggleSubMenu = (menu: string) => {
-    openSubMenu.value =
-        openSubMenu.value === menu ? null : menu;
+    if (openSubMenu.value === menu) {
+        openSubMenu.value = null;
+    } else {
+        openSubMenu.value = menu;
+    }
 };
 
 // initialize components based on data attribute selectors
