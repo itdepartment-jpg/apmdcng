@@ -142,6 +142,19 @@
                 :current-route="currentRoute"
                 @toggle-menu="toggleMenu"
             />
+        
+            <!-- =========================================
+               Career MANAGEMENT
+            ========================================= -->
+
+
+             <CareerSidebar
+                :open-menu="openMenu"
+                :open-sub-menu="openSubMenu"
+                :current-route="currentRoute"
+                @toggle-menu="toggleMenu"
+                @toggle-sub-menu="toggleSubMenu"
+            />
 
              <!-- =========================================
                 USER MANAGEMENT
@@ -468,6 +481,7 @@ import ProjectSidebar from "@/Components/Sidebar/ProjectSidebar.vue";
 import CommunicationSidebar from "@/Components/Sidebar/CommunicationSidebar.vue";
 import AccountSidebar from "@/Components/Sidebar/AccountSidebar.vue";
 import AdministrationSidebar from "@/Components/Sidebar/AdministrationSidebar.vue";
+import CareerSidebar from "@/Components/Sidebar/CareerSidebar.vue";
 
 import {
     initAccordions,

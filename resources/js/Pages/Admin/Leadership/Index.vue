@@ -1,539 +1,896 @@
-<template>
-
-
-    <Head title="Dashboard" />
-
-    <AuthenticatedLayout>
-        <template #header>
-            <h2
-                class="text-xl font-semibold leading-tight text-gray-800"
-            >
-                Leadership
-            </h2>
-        </template>
-
-        <div class="py-12">
-
-
-
-            <section class="py-16 bg-white">
-                <div class="container mx-auto px-6 lg:px-12">
-                    <!-- Editable Header -->
-                    <div class="text-center mb-16">
-                        <div v-if="!editingHeader">
-                            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 uppercase mb-4">
-                                <span class="border-b-4 border-[#FFC107] pb-2">{{ header.title }}</span>
-                            </h2>
-                            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
-                                {{ header.description }}
-                            </p>
-                            <button
-                                v-if="canEdit"
-                                @click="startEditingHeader"
-                                class="mt-4 text-blue-600 hover:text-blue-800 flex items-center justify-center mx-auto"
-                            >
-                                <PencilIcon class="h-5 w-5 mr-1" /> Edit Header
-                            </button>
-                        </div>
-
-                        <div v-else class="max-w-3xl mx-auto">
-                            <input
-                                v-model="headerForm.title"
-                                class="w-full text-3xl md:text-4xl font-bold text-gray-800 mb-4 p-2 border rounded text-center"
-                            >
-                            <textarea
-                                v-model="headerForm.description"
-                                class="w-full text-lg text-gray-600 p-2 border rounded"
-                                rows="3"
-                            ></textarea>
-
-
-                            <div class="flex justify-center space-x-4 mt-4">
-                                <button
-                                    @click="updateHeader"
-                                    class="px-4 py-2 bg-green-600 text-white rounded flex items-center"
-                                    :disabled="headerForm.processing"
-                                >
-                                    <CheckIcon class="h-5 w-5 mr-1" /> Save
-                                </button>
-                                <button
-                                    @click="cancelEditingHeader"
-                                    class="px-4 py-2 bg-gray-600 text-white rounded flex items-center"
-                                >
-
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-1">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                    </svg>
-
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Category Tabs -->
-                    <div class="flex justify-center mb-8 border-b border-gray-200">
-                        <button
-                            v-for="tab in tabs"
-                            :key="tab.id"
-                            @click="activeTab = tab.id"
-                            :class="[
-            'px-4 py-2 font-medium',
-            activeTab === tab.id
-              ? 'text-[#0077B6] border-b-2 border-[#0077B6]'
-              : 'text-gray-500 hover:text-[#0077B6]'
-          ]"
-                        >
-                            {{ tab.label }}
-                        </button>
-                    </div>
-
-                    <!-- Add New Member Button -->
-                    <div v-if="canEdit" class="flex justify-end mb-6">
-                        <button
-                            @click="openAddMemberForm"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center hover:bg-blue-700 transition-colors"
-                        >
-                            <PlusIcon class="h-5 w-5 mr-1" /> Add New Member
-                        </button>
-                    </div>
-
-                    <!-- Add Member Form -->
-                    <div v-if="addingMember" class="bg-gray-50 rounded-xl p-6 mb-12 shadow-lg">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Add New Team Member</h3>
-                        <div class="grid md:grid-cols-3 gap-6">
-                            <div class="md:col-span-1">
-                                <div class="h-64 bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center relative">
-                                    <template v-if="!memberForm.previewImage">
-                                        <label class="cursor-pointer text-center p-4">
-                                            <div class="flex flex-col items-center">
-                                                <PlusIcon class="h-12 w-12 text-gray-400" />
-                                                <span class="mt-2 text-sm text-gray-600">Upload Image (500x500)</span>
-                                            </div>
-                                            <input
-                                                type="file"
-                                                @change="handleImageUpload"
-                                                class="hidden"
-                                                accept="image/*"
-                                            >
-                                        </label>
-                                    </template>
-                                    <img
-                                        v-else
-                                        :src="memberForm.previewImage"
-                                        class="w-full h-full object-cover"
-                                    >
-                                </div>
-                            </div>
-                            <div class="md:col-span-2">
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Name*</label>
-                                        <input
-                                            v-model="memberForm.name"
-                                            class="w-full p-2 border rounded"
-                                            placeholder="Full name"
-                                        >
-                                        <p v-if="memberForm.errors.name" class="text-red-500 text-sm mt-1">
-                                            {{ memberForm.errors.name }}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Position*</label>
-                                        <input
-                                            v-model="memberForm.position"
-                                            class="w-full p-2 border rounded"
-                                            placeholder="Job title"
-                                        >
-                                        <p v-if="memberForm.errors.position" class="text-red-500 text-sm mt-1">
-                                            {{ memberForm.errors.position }}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Category*</label>
-                                        <select
-                                            v-model="memberForm.category"
-                                            class="w-full p-2 border rounded"
-                                        >
-                                            <option value="executive">Executive Leadership</option>
-                                            <option value="senior">Senior Management</option>
-                                            <option value="key">Key Personnel</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Description*</label>
-<!--                                        <textarea-->
-<!--                                            v-model="memberForm.description"-->
-<!--                                            rows="4"-->
-<!--                                            class="w-full p-2 border rounded"-->
-<!--                                            placeholder="Brief bio and qualifications"-->
-<!--                                        ></textarea>-->
-                                        <WysiwygEditor
-                                            v-model="memberForm.description"
-                                            :error="memberForm.errors.description"
-                                            placeholder="Brief bio and qualifications"
-                                        />
-                                        <p v-if="memberForm.errors.description" class="text-red-500 text-sm mt-1">
-                                            {{ memberForm.errors.description }}
-                                        </p>
-                                    </div>
-                                    <div class="flex space-x-4">
-                                        <button
-                                            @click="createMember"
-                                            class="px-4 py-2 bg-green-600 text-white rounded flex items-center hover:bg-green-700 transition-colors"
-                                            :disabled="memberForm.processing"
-                                        >
-                                            <CheckIcon class="h-5 w-5 mr-1" /> Save Member
-                                        </button>
-                                        <button
-                                            @click="cancelAddMember"
-                                            class="px-4 py-2 bg-gray-600 text-white rounded flex items-center hover:bg-gray-700 transition-colors"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-1">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                            </svg>
-
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Members List -->
-                    <div v-if="activeTab === 'executive' && executives.length" class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
-                        <LeadershipMemberCard
-                            v-for="member in executives"
-                            :key="member.id"
-                            :member="member"
-                            :can-edit="canEdit"
-                            :is-editing="editingMemberId === member.id"
-                            @edit="editMember(member)"
-                            @save="saveMember"
-                            @cancel="cancelEditMember"
-                            @delete="deleteMember(member.id)"
-                        />
-                    </div>
-
-                    <div v-if="activeTab === 'senior' && seniors.length" class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
-                        <LeadershipMemberCard
-                            v-for="member in seniors"
-                            :key="member.id"
-                            :member="member"
-                            :can-edit="canEdit"
-                            :is-editing="editingMemberId === member.id"
-                            @edit="editMember(member)"
-                            @save="saveMember"
-                            @cancel="cancelEditMember"
-                            @delete="deleteMember(member.id)"
-                        />
-                    </div>
-
-                    <div v-if="activeTab === 'key'" class="max-w-4xl mx-auto">
-                        <h3 class="text-2xl font-bold text-center text-gray-800 mb-8">KEY PERSONNEL</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            <KeyPersonnelCard
-                                v-for="member in keyPersonnel"
-                                :key="member.id"
-                                :member="member"
-                                :can-edit="canEdit"
-                                :is-editing="editingMemberId === member.id"
-                                @edit="editMember(member)"
-                                @save="saveMember"
-                                @cancel="cancelEditMember"
-                                @delete="deleteMember(member.id)"
-                            />
-                        </div>
-                    </div>
-
-                    <EmptyState
-                        v-if="activeMembers.length === 0"
-                        message="No team members found"
-                        :action-text="canEdit ? 'Add your first team member' : undefined"
-                        @action="openAddMemberForm"
-                    />
-                </div>
-            </section>
-        </div>
-    </AuthenticatedLayout>
-</template>
-
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, router, useForm, usePage } from '@inertiajs/vue3';
-import { PlusIcon, TrashIcon, PencilIcon, CheckIcon } from '@heroicons/vue/24/outline';
-import LeadershipMemberCard from '@/Components/LeadershipMemberCard.vue';
-import KeyPersonnelCard from '@/Components/KeyPersonnelCard.vue';
-import EmptyState from '@/Components/EmptyState.vue';
-import RichTextEditor from "@/Components/RichTextEditor.vue";
-import WysiwygEditor from '@/Components/WysiwygEditor.vue'
+import { Head } from "@inertiajs/vue3";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { ref } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import { Link } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 
+const page = usePage();
+const showLeaderModal = ref(false);
 
-// Types
-interface Member {
+interface LeadershipMember {
     id: number;
     name: string;
     position: string;
-    image_url: string | null;
     description: string;
-    category: 'executive' | 'senior' | 'key';
+    category: string;
+    image_path: string | null;
+    email: string | null;
+    phone: string | null;
+    linkedin: string | null;
     order: number;
 }
 
-interface ChildFormData {
-    name: string;
-    position: string;
-    description: string;
-    image: File | null;
-    previewImage: string | null;
-}
-
-interface Tab {
-    id: 'executive' | 'senior' | 'key';
-    label: string;
-}
-
-interface Header {
-    title: string;
-    description: string;
-}
-
-// Props
 const props = defineProps<{
-    executives: Member[];
-    seniors: Member[];
-    keyPersonnel: Member[];
-    header: Header;
-    canEdit: boolean;
+    executives: LeadershipMember[];
+    seniors: LeadershipMember[];
+    keyPersonnel: LeadershipMember[];
 }>();
 
-// State
-const activeTab = ref<'executive' | 'senior' | 'key'>('executive');
-const editingHeader = ref(false);
-const addingMember = ref(false);
-const editingMemberId = ref<number | null>(null);
+import { computed } from "vue";
 
-const tabs: Tab[] = [
-    { id: 'executive', label: 'Executive Leadership' },
-    { id: 'senior', label: 'Senior Management' },
-    { id: 'key', label: 'Key Personnel' }
-];
+const allMembers = computed(() => [
+    ...props.executives.map(member => ({
+        ...member,
+        categoryLabel: "Executive Leadership",
+    })),
+    ...props.seniors.map(member => ({
+        ...member,
+        categoryLabel: "Senior Management",
+    })),
+    ...props.keyPersonnel.map(member => ({
+        ...member,
+        categoryLabel: "Key Personnel",
+    })),
+]);
 
-// Computed
-const activeMembers = computed(() => {
-    switch (activeTab.value) {
-        case 'executive': return props.executives;
-        case 'senior': return props.seniors;
-        case 'key': return props.keyPersonnel;
-        default: return [];
-    }
-});
+const showDeleteModal = ref(false);
+const selectedLeader = ref(null); 
 
-// Forms
-const headerForm = useForm({
-    title: props.header.title,
-    description: props.header.description
-});
-
-const memberForm = useForm<{
-    id?: number;
-    name: string;
-    position: string;
-    description: string;
-    category: 'executive' | 'senior' | 'key';
-    order: number;
-    image: File | null;
-    previewImage: string | null;
-}>({
-    name: '',
-    position: '',
-    description: '',
-    category: 'executive',
-    order: 0,
-    image: null,
-    previewImage: null
-});
-
-// const memberForm = useForm<{
-//     name: string;
-//     position: string;
-//     description: string;
-//     category: 'executive' | 'senior' | 'key';
-//     order: number;
-//     image: File | null;
-//     previewImage: string | null;
-//     id?: number;
-// }>({
-//     name: '',
-//     position: '',
-//     description: '',
-//     category: 'executive',
-//     order: 0,
-//     image: null,
-//     previewImage: null
-// });
-
-// Methods
-const startEditingHeader = () => {
-    headerForm.title = props.header.title;
-    headerForm.description = props.header.description;
-    editingHeader.value = true;
+const confirmDelete = (leader) => {
+    selectedLeader.value = leader;
+    showDeleteModal.value = true;
 };
 
-const cancelEditingHeader = () => {
-    editingHeader.value = false;
-    headerForm.reset();
-};
-
-const updateHeader = () => {
-    headerForm.put(route('leadership.update-header'), {
+const deleteLeader = () => {
+    router.delete(route("leadership.destroy", selectedLeader.value.id), {
         preserveScroll: true,
+
         onSuccess: () => {
-            editingHeader.value = false;
-        }
+            showDeleteModal.value = false;
+            selectedLeader.value = null;
+        },
     });
-};
-
-const openAddMemberForm = () => {
-    addingMember.value = true;
-    memberForm.reset();
-    memberForm.category = activeTab.value;
-    memberForm.previewImage = null;
-};
-
-const cancelAddMember = () => {
-    addingMember.value = false;
-    memberForm.reset();
-    memberForm.previewImage = null;
-};
-
-const handleImageUpload = (event: Event) => {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        memberForm.image = file;
-        memberForm.previewImage = URL.createObjectURL(file);
-    }
-};
-
-const editMember = (member: Member) => {
-    editingMemberId.value = member.id;
-    memberForm.name = member.name;
-    memberForm.position = member.position;
-    memberForm.description = member.description;
-    memberForm.category = member.category;
-    memberForm.order = member.order;
-    memberForm.previewImage = member.image_url;
-    memberForm.id = member.id;
-};
-
-const cancelEditMember = () => {
-    editingMemberId.value = null;
-    memberForm.reset();
-    memberForm.previewImage = null;
-};
-
-const saveMember1 = () => {
-    if (memberForm.id) {
-        updateMember();
-    } else {
-        createMember();
-    }
-};
-//
-
-
-const saveMember = (childFormData:ChildFormData) => {
-    console.log('Data received from child:', childFormData);
-
-    // Update parent form with child data
-    memberForm.name = childFormData.name;
-    memberForm.position = childFormData.position;
-    memberForm.description = childFormData.description;
-    memberForm.image = childFormData.image;
-    memberForm.previewImage = childFormData.previewImage;
-
-    if (memberForm.id) {
-        updateMember(childFormData);
-    } else {
-        createMember();
-    }
-};
-
-
-const createMember = () => {
-    memberForm.post(route('leadership.store'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            addingMember.value = false;
-            memberForm.reset();
-            memberForm.previewImage = null;
-        }
-    });
-};
-
-
-const updateMember = (childFormData?:ChildFormData) => {
-
-    if (!childFormData) {
-        // Handle the case where no data is passed
-        return;
-    }
-    if (!memberForm.id) return;
-
-    // Create regular object for non-file data
-    const formData = {
-        name: childFormData.name,
-        position: childFormData.position,
-        description: childFormData.description,
-        category: memberForm.category,
-        order: memberForm.order.toString(),
-        _method: 'PUT' // Laravel method spoofing
-    };
-
-    // Handle file upload separately if exists
-    if (childFormData.image instanceof File) {
-        // Create FormData when we have files
-        const formDataWithFile = new FormData();
-        Object.entries(formData).forEach(([key, value]) => {
-            formDataWithFile.append(key, value);
-        });
-        formDataWithFile.append('image', childFormData.image);
-
-        router.post(route('leadership.update', memberForm.id), formDataWithFile, {
-            forceFormData: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                editingMemberId.value = null;
-                memberForm.reset();
-                memberForm.previewImage = null;
-            },
-            onError: (errors) => {
-                console.error('Update error:', errors);
-            }
-        });
-    } else {
-        // Regular PUT request when no files
-        router.put(route('leadership.update', memberForm.id), formData, {
-            preserveScroll: true,
-            onSuccess: () => {
-                editingMemberId.value = null;
-                memberForm.reset();
-                memberForm.previewImage = null;
-            },
-            onError: (errors) => {
-                console.error('Update error:', errors);
-            }
-        });
-    }
-};
-const deleteMember = (id: number) => {
-    if (confirm('Are you sure you want to delete this team member?')) {
-        useForm({}).delete(route('leadership.destroy', id), {
-            preserveScroll: true
-        });
-    }
 };
 </script>
+
+
+<template>
+    <Head title="Leadership Management" />
+
+    <AuthenticatedLayout>
+
+        <div
+             v-if="page.props.flash?.success"
+            class="mb-6 rounded-lg border border-green-200 bg-green-50 px-5 py-4 text-green-700"
+        >
+            {{ page.props.flash.success }}
+        </div>
+
+        <template #header>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                Leadership Management
+            </h2>
+        </template>
+
+        <div class="py-8">
+
+            <div class="max-w-7xl mx-auto px-6">
+
+                <!-- =========================================
+                     PAGE HEADER
+                ========================================= -->
+
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+
+                    <div>
+
+                        <h1 class="text-3xl font-bold text-gray-900">
+                            Leadership Management
+                        </h1>
+
+                        <p class="mt-2 text-gray-600">
+                            Manage Executive Leadership, Senior Management
+                            and Key Personnel from one central dashboard.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <!-- =========================================
+                    LEADERSHIP STATISTICS
+                ========================================= -->
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
+
+                    <!-- Executive -->
+
+                    <div
+                        class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+
+                        <p
+                            class="text-sm text-gray-500">
+
+                            Executive Leadership
+
+                        </p>
+
+                        <h2
+                            class="mt-3 text-4xl font-bold text-[#303791]">
+
+                           {{ executives.length }}
+
+                        </h2>
+
+                    </div>
+
+                    <!-- Senior -->
+
+                    <div
+                        class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+
+                        <p
+                            class="text-sm text-gray-500">
+
+                            Senior Management
+
+                        </p>
+
+                        <h2
+                            class="mt-3 text-4xl font-bold text-[#303791]">
+
+                            {{ seniors.length }}
+
+                        </h2>
+
+                    </div>
+
+                    <!-- Key -->
+
+                    <div
+                        class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+
+                        <p
+                            class="text-sm text-gray-500">
+
+                            Key Personnel
+
+                        </p>
+
+                        <h2
+                            class="mt-3 text-4xl font-bold text-[#303791]">
+
+                            {{ keyPersonnel.length }}
+
+                        </h2>
+
+                    </div>
+
+                    <!-- Total -->
+
+                    <div
+                        class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+
+                        <p
+                            class="text-sm text-gray-500">
+
+                            Total Members
+
+                        </p>
+
+                        <h2
+                            class="mt-3 text-4xl font-bold text-[#EA222F]">
+
+                           {{
+                                executives.length +
+                                seniors.length +
+                                keyPersonnel.length
+                            }}
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+                <!-- =========================================
+                    TOOLBAR
+                ========================================= -->
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 mb-8">
+
+                    <div class="flex items-center gap-4">
+
+                        <!-- Search -->
+                        <!-- Search -->
+                    <div class="relative flex-1">
+
+                        <div
+                            class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none"
+                        >
+                            
+                        </div>
+
+                         <input
+                            type="text"
+                            placeholder="Search leaders by name, position or category..."
+                            class="w-full h-12 rounded-lg border border-gray-300 px-4 focus:border-[#303791] focus:ring-2 focus:ring-[#303791]/20"
+                        />
+
+                    </div>
+                        <!-- Category -->
+                        <select
+                            class="w-60 h-12 rounded-lg border border-gray-300 px-4 focus:ring-2 focus:ring-[#303791]"
+                        >
+                            <option>All Categories</option>
+                            <option>Executive Leadership</option>
+                            <option>Senior Management</option>
+                            <option>Key Personnel</option>
+                        </select>
+
+                        <!-- Button -->
+                        <Link
+                            :href="route('admin.leadership.create')"
+                            class="inline-flex items-center rounded-lg bg-[#EA222F] px-5 py-3 font-semibold text-white hover:bg-red-700"
+                        >
+                            Add Leader
+                        </Link>
+
+                    </div>
+
+                </div>
+
+                <!-- =========================================
+                    LEADERSHIP TABLE
+                ========================================= -->
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+
+                    <!-- =========================================
+                        TABLE HEADER
+                    ========================================= -->
+
+                    <div
+                        class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+
+                        <div>
+
+                            <h3 class="text-lg font-semibold text-gray-800">
+                                Leadership Directory
+                            </h3>
+
+                            <p class="text-sm text-gray-500">
+                                Manage all leadership members from one place.
+                            </p>
+
+                        </div>
+
+                        <div class="flex items-center gap-2">
+
+                            <button
+                                class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition">
+
+                                Refresh
+
+                            </button>
+
+                            <button
+                                class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition">
+
+                                Export
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Table -->
+
+                    <div class="overflow-x-auto">
+
+                        <table class="min-w-full divide-y divide-gray-200">
+
+                            <thead class="bg-gray-50">
+
+                                <tr>
+
+                                    <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        Photo
+                                    </th>
+
+                                    <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        Name
+                                    </th>
+
+                                    <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        Position
+                                    </th>
+
+                                    <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        Category
+                                    </th>
+
+                                    <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        Order
+                                    </th>
+
+                                    <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        Status
+                                    </th>
+
+                                    <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        Actions
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody class="divide-y divide-gray-100">
+
+                                <!-- Empty State -->
+
+                               <tr
+                                    v-for="member in allMembers"
+                                    :key="member.id"
+                                    class="hover:bg-gray-50 transition"
+                                >
+
+                                    <!-- Photo -->
+                                    <td class="px-6 py-4">
+
+                                       <img
+                                        v-if="member.image_path"
+                                        :src="`/storage/${member.image_path}`"
+                                        class="w-12 h-12 rounded-full object-cover border"
+                                    >
+
+                                        <div
+                                            v-else
+                                            class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center"
+                                        >
+                                            👤
+                                        </div>
+
+                                    </td>
+
+                                    <!-- Name -->
+
+                                    <td class="px-6 py-4 font-semibold text-gray-800">
+
+                                        {{ member.name }}
+
+                                    </td>
+
+                                    <!-- Position -->
+
+                                    <td class="px-6 py-4">
+
+                                        {{ member.position }}
+
+                                    </td>
+
+                                    <!-- Category -->
+
+                                    <td class="px-6 py-4 text-center">
+
+                                        <span
+                                            class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+
+                                            {{ member.categoryLabel }}
+
+                                        </span>
+
+                                    </td>
+
+                                    <!-- Order -->
+
+                                    <td class="px-6 py-4 text-center">
+
+                                        {{ member.order }}
+
+                                    </td>
+
+                                    <!-- Status -->
+
+                                    <td class="px-6 py-4 text-center">
+
+                                        <span
+                                            class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+
+                                            Active
+
+                                        </span>
+
+                                    </td>
+
+                                    <!-- Actions -->
+
+                                    <td class="px-6 py-4">
+
+                                        <div class="flex justify-end gap-2">
+
+                                            <Link
+                                                :href="route('admin.leadership.edit', member.id)"
+                                                class="inline-flex items-center rounded-lg bg-blue-100 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-200"
+                                            >
+                                                Edit
+                                            </Link>
+
+                                            <button
+                                               @click="confirmDelete(member)"
+                                                class="inline-flex items-center rounded-lg bg-red-100 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-200"
+                                            >
+                                                Delete
+                                            </button>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+                <!-- =========================================
+                    ADD LEADER MODAL
+                ========================================= -->
+
+                <div
+                    v-if="showLeaderModal"
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6"
+                >
+
+                    <div
+                        class="w-full max-w-7xl rounded-2xl bg-white shadow-2xl overflow-hidden">
+
+                        <!-- ==============================
+                            HEADER
+                        =============================== -->
+
+                        <div
+                            class="flex items-center justify-between border-b bg-gray-50 px-8 py-6">
+
+                            <div>
+
+                                <h2 class="text-2xl font-bold text-gray-800">
+                                    Add Leadership Member
+                                </h2>
+
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Complete the information below to add a new leadership member.
+                                </p>
+
+                            </div>
+
+                            <button
+                                @click="showLeaderModal = false"
+                                class="flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:bg-red-100 hover:text-red-600">
+
+                                ✕
+
+                            </button>
+
+                        </div>
+
+                        <!-- ==============================
+                            BODY
+                        =============================== -->
+
+                     <div class="flex gap-12 px-8 py-6">
+
+                           
+
+                           <!-- =====================================
+                                PROFILE PHOTO
+                            ===================================== -->
+
+                            <div class="w-[30%]">
+
+                                <div class="h-full min-h-[250px] rounded-2xl border border-gray-200 bg-gray-50 p-8 shadow-sm flex flex-col">
+
+                                    <!-- Heading -->
+
+                                    <h3 class="text-xl font-semibold text-gray-800">
+                                        Profile Photo
+                                    </h3>
+
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        Upload a professional photo for this leader.
+                                    </p>
+
+                                    <!-- Image Preview -->
+
+                                    <div class="mt-6 flex h-[200px] w-full items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-white overflow-hidden">
+
+                                        <img
+                                            v-if="imagePreview"
+                                            :src="imagePreview"
+                                            class="h-full w-full object-cover"
+                                        >
+
+                                        <div
+                                            v-else
+                                            class="text-center"
+                                        >
+
+                                            <div
+                                                class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100"
+                                            >
+
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    class="h-10 w-10 text-gray-400"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="1.5"
+                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                    />
+                                                </svg>
+
+                                            </div>
+
+                                            <h4 class="font-semibold text-gray-700">
+                                                No Photo Selected
+                                            </h4>
+
+                                            <p class="mt-2 text-sm text-gray-500">
+                                                Click below to upload a profile photo.
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Upload Button -->
+
+                                    <label
+                                        class="mt-6 flex w-full cursor-pointer items-center justify-center rounded-xl bg-[#303791] py-3 font-semibold text-white transition hover:bg-[#252d72]"
+                                    >
+
+                                        Upload Photo
+
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            class="hidden"
+                                        >
+
+                                    </label>
+
+                                    <!-- Remove Button -->
+
+                                    <button
+                                        type="button"
+                                        class="mt-3 w-full rounded-xl border border-red-300 py-3 font-medium text-red-600 transition hover:bg-red-50"
+                                    >
+                                        Remove Photo
+                                    </button>
+
+                                    <!-- Help Text -->
+
+                                    <div class="mt-5 text-center">
+
+                                        <p class="text-sm text-gray-500">
+                                            Recommended Size
+                                        </p>
+
+                                        <p class="font-semibold text-gray-700">
+                                            500 × 500 pixels
+                                        </p>
+
+                                        <p class="mt-2 text-xs text-gray-400">
+                                            JPG, PNG or WEBP • Maximum file size: 2MB
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- ===========================================
+                                LEADER INFORMATION (70%)
+                            ============================================ -->
+
+                            <div class="flex-1">
+
+                                <div class="rounded-xl border border-gray-200 bg-white p-6">
+
+                                    <!-- =====================================
+                                        LEADER INFORMATION
+                                    ===================================== -->
+
+                                    
+
+                                        <div class="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+
+                                            <!-- Heading -->
+
+                                            <h3 class="text-xl font-semibold text-gray-800">
+                                                Leader Information
+                                            </h3>
+
+                                            <p class="mt-1 text-sm text-gray-500 mb-8">
+                                                Enter the leader's profile information below.
+                                            </p>
+
+                                            <!-- Form -->
+
+                                            <div class="grid grid-cols-2 gap-6">
+
+                                                <!-- Full Name -->
+
+                                                <div>
+
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                        Full Name <span class="text-red-500">*</span>
+                                                    </label>
+
+                                                    <input
+                                                        type="text"
+                                                        placeholder="e.g. John Doe"
+                                                        class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-[#303791] focus:ring-2 focus:ring-[#303791]/20"
+                                                    >
+
+                                                </div>
+
+                                                <!-- Position -->
+
+                                                <div>
+
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                        Position <span class="text-red-500">*</span>
+                                                    </label>
+
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Managing Director"
+                                                        class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-[#303791] focus:ring-2 focus:ring-[#303791]/20"
+                                                    >
+
+                                                </div>
+
+                                                <!-- Category -->
+
+                                                <div>
+
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                        Category
+                                                    </label>
+
+                                                    <select
+                                                        class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-[#303791] focus:ring-2 focus:ring-[#303791]/20"
+                                                    >
+
+                                                        <option>Executive Leadership</option>
+                                                        <option>Senior Management</option>
+                                                        <option>Key Personnel</option>
+
+                                                    </select>
+
+                                                </div>
+
+                                                <!-- Display Order -->
+
+                                                <div>
+
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                        Display Order
+                                                    </label>
+
+                                                    <input
+                                                        type="number"
+                                                        value="1"
+                                                        class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-[#303791] focus:ring-2 focus:ring-[#303791]/20"
+                                                    >
+
+                                                </div>
+
+                                                <!-- =====================================
+                                                EMAIL
+                                            ===================================== -->
+
+                                            <div>
+
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                    Email Address
+                                                </label>
+
+                                                <input
+                                                    type="email"
+                                                    placeholder="johndoe@apmdcng.com"
+                                                    class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-[#303791] focus:ring-2 focus:ring-[#303791]/20"
+                                                >
+
+                                            </div>
+
+                                            <!-- =====================================
+                                                LINKEDIN
+                                            ===================================== -->
+
+                                            <div>
+
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                    LinkedIn Profile
+                                                </label>
+
+                                                <input
+                                                    type="url"
+                                                    placeholder="https://linkedin.com/in/johndoe"
+                                                    class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-[#303791] focus:ring-2 focus:ring-[#303791]/20"
+                                                >
+
+                                            </div>
+
+                                            </div>
+
+                                            <!-- Biography -->
+
+                                            <div class="mt-8">
+
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                    Biography
+                                                </label>
+
+                                                <textarea
+                                                    rows="8"
+                                                    placeholder="Write a short biography about this leader..."
+                                                    class="w-full rounded-xl border border-gray-300 px-4 py-3 resize-none focus:border-[#303791] focus:ring-2 focus:ring-[#303791]/20"
+                                                ></textarea>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                           
+
+                        </div>
+
+                        <!-- ==============================
+                            FOOTER
+                        =============================== -->
+
+                        <div
+                            class="flex justify-end gap-3 border-t bg-gray-50 px-8 py-5">
+
+                            <button
+                                @click="showLeaderModal = false"
+                                class="rounded-lg border border-gray-300 px-6 py-3 hover:bg-gray-100">
+
+                                Cancel
+
+                            </button>
+
+                            <button
+                                class="rounded-lg bg-[#EA222F] px-8 py-3 font-semibold text-white hover:bg-red-700">
+
+                                Save Leader
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                       
+
+
+                </div>
+
+            </div>
+
+            <!-- =========================================
+    DELETE LEADER MODAL
+========================================= -->
+
+<div
+    v-if="showDeleteModal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+>
+    <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl">
+
+        <!-- Header -->
+
+        <div class="border-b px-6 py-5">
+
+            <h2 class="text-xl font-bold text-gray-800">
+                Delete Leadership Member
+            </h2>
+
+        </div>
+
+        <!-- Body -->
+
+        <div class="px-6 py-8 text-center">
+
+            <!-- Photo -->
+
+            <img
+                v-if="selectedLeader?.image_path"
+                :src="`/storage/${selectedLeader.image_path}`"
+                class="mx-auto h-24 w-24 rounded-full object-cover border-4 border-gray-100"
+            >
+
+            <div
+                v-else
+                class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gray-100 text-4xl"
+            >
+                👤
+            </div>
+
+            <h3 class="mt-5 text-lg font-bold text-gray-800">
+                {{ selectedLeader?.name }}
+            </h3>
+
+            <p class="text-gray-500">
+                {{ selectedLeader?.position }}
+            </p>
+
+            <div class="mt-6 rounded-lg bg-red-50 p-4">
+
+                <p class="text-sm text-red-600">
+                    This action is permanent and cannot be undone.
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+
+        <div class="flex justify-end gap-3 border-t px-6 py-5">
+
+            <button
+                @click="showDeleteModal = false"
+                class="rounded-lg border border-gray-300 px-5 py-2 font-medium hover:bg-gray-100"
+            >
+                Cancel
+            </button>
+
+            <button
+                @click="deleteLeader"
+                class="rounded-lg bg-[#EA222F] px-5 py-2 font-medium text-white hover:bg-red-700"
+            >
+                Delete Member
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+    </AuthenticatedLayout>
+
+</template>
+

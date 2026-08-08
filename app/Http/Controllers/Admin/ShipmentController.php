@@ -72,7 +72,7 @@ class ShipmentController extends Controller
         Shipment::create($validated);
 
         return redirect()
-            ->route('shipments.index')
+            ->route('admin.shipments.index')
             ->with('success', 'Shipment created successfully.');
     }
 
@@ -117,7 +117,7 @@ class ShipmentController extends Controller
     $shipment->update($validated);
 
     return redirect()
-        ->route('shipments.index')
+        ->route('admin.shipments.index')
         ->with('success', 'Shipment updated successfully.');
 }
     /**

@@ -134,11 +134,11 @@ const shipmentMenus = [
         links: [
             {
                 label: "All Shipments",
-                route: "shipments.index",
+                route: "admin.shipments.index",
             },
             {
                 label: "+ Add Shipment",
-                route: "shipments.create",
+                route: "admin.shipments.create",
             },
         ],
     },
@@ -149,11 +149,11 @@ const shipmentMenus = [
         links: [
             {
                 label: "All Partners",
-                route: "partners.index",
+                route: "admin.partners.index",
             },
             {
                 label: "+ Add Partner",
-                route: "partners.create",
+                route: "admin.partners.create",
             },
         ],
     },
@@ -164,11 +164,11 @@ const shipmentMenus = [
         links: [
             {
                 label: "All Carriers",
-                route: "carriers.index",
+                route: "admin.carriers.index",
             },
             {
                 label: "+ Add Carrier",
-                route: "carriers.create",
+                route: "admin.carriers.create",
             },
         ],
     },

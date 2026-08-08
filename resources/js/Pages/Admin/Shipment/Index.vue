@@ -32,7 +32,7 @@ const deleteShipment = (id) => {
                 </div>
 
                 <Link
-                    :href="route('shipments.create')"
+                    :href="route('admin.shipments.create')"
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-block"
                 >
                     + New Shipment
@@ -101,7 +101,7 @@ const deleteShipment = (id) => {
                                 <div class="flex justify-center gap-2">
 
                                     <Link
-                                        :href="route('shipments.edit', shipment.id)"
+                                        :href="route('admin.shipments.edit', shipment.id)"
                                         class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
                                     >
                                         Edit

@@ -3,6 +3,7 @@ import { Link } from "@inertiajs/vue3";
 import {
     UserGroupIcon,
     PlusCircleIcon,
+    ClipboardDocumentListIcon,
 } from "@heroicons/vue/24/outline";
 
 const {
@@ -17,6 +18,8 @@ defineEmits([
     "toggle-menu",
 ]);
 
+
+
 const sidebarClass =
     "flex items-center pl-8 pr-3 py-3 rounded-lg group font-medium transition-all duration-200";
 
@@ -26,23 +29,26 @@ const sidebarActiveClass =
 const sidebarInactiveClass =
     "text-white/80 hover:bg-[#EA222F]/10 hover:text-white";
 
+
+
 const leadershipLinks = [
     {
         label: "All Leaders",
-        href: "#", // route('leadership.index')
+        href: route("admin.leadership.index"),
         icon: UserGroupIcon,
-        active: (route: string) =>
-            route.includes("/leadership") &&
-            !route.includes("/create"),
+        active: (currentRoute: string) =>
+            currentRoute.includes("/admin/leadership") &&
+            !currentRoute.includes("/create"),
     },
     {
         label: "Add Leader",
-        href: "#", // route('leadership.create')
+        href: route("admin.leadership.create"),
         icon: PlusCircleIcon,
-        active: (route: string) =>
-            route.includes("/leadership/create"),
+        active: (currentRoute: string) =>
+            currentRoute.includes("/admin/leadership/create"),
     },
 ];
+
 </script>
 
 <template>

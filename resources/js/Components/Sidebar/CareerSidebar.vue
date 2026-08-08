@@ -62,69 +62,66 @@ const careerLinks = [
 </script>
 
 <template>
-    <!-- ======================================================
-        Career Management
-    ======================================================= -->
-
-    <li
-        class="mb-2 mt-5 cursor-pointer"
-        @click="$emit('toggle-menu', 'careers')"
+    <!-- Career Management -->
+<li
+    class="mt-5 mb-5 cursor-pointer"
+    @click="$emit('toggle-menu', 'careers')"
+>
+    <div
+        class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 transition-colors hover:text-white"
     >
-        <div
-            class="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white/50 transition-colors hover:text-white"
-        >
-            <span>Career Management</span>
+        <span>Career Management</span>
 
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                class="h-4 w-4 transition-transform duration-300"
-                :class="{ 'rotate-180': openMenu === 'careers' }"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                />
-            </svg>
-        </div>
+        <svg
+            class="h-4 w-4 transition-transform duration-300"
+            :class="{
+                'rotate-180': openMenu === 'careers',
+            }"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+            />
+        </svg>
+    </div>
+</li>
+
+<!-- Career Links -->
+<div
+    v-show="openMenu === 'careers'"
+    class="space-y-1 overflow-hidden transition-all duration-300"
+>
+    <li
+        v-for="link in careerLinks"
+        :key="link.route"
+    >
+        <Link
+            :href="route(link.route)"
+            :class="[
+                sidebarClass,
+                route().current(link.route)
+                    ? sidebarActiveClass
+                    : sidebarInactiveClass,
+            ]"
+        >
+            <component
+                :is="link.icon"
+                class="h-5 w-5"
+            />
+
+            <span class="ml-3">
+                {{ link.label }}
+            </span>
+        </Link>
     </li>
 
-    <!-- ======================================================
-        Career Links
-    ======================================================= -->
-
-    <div
-        v-show="openMenu === 'careers'"
-        class="space-y-2 overflow-hidden"
-    >
-        <li
-            v-for="link in careerLinks"
-            :key="link.route"
-        >
-            <Link
-                :href="route(link.route)"
-                :class="[
-                    sidebarClass,
-                    route().current(link.route)
-                        ? sidebarActiveClass
-                        : sidebarInactiveClass,
-                ]"
-            >
-                <component
-                    :is="link.icon"
-                    class="h-5 w-5"
-                />
-
-                <span class="ml-3">
-                    {{ link.label }}
-                </span>
-            </Link>
-        </li>
-
-        <li class="my-4 border-t border-white/10"></li>
-    </div>
+    <!-- Divider / Spacing -->
+    <li class="mt-4 mb-8 border-t border-white/10"></li>
+</div>
 </template>
