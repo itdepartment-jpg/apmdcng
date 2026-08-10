@@ -1,16 +1,23 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import InputError from "@/Components/InputError.vue";
 
-/*
-|--------------------------------------------------------------------------
-| Form
-|--------------------------------------------------------------------------
-*/
+interface LeadershipForm {
+    name: string;
+    position: string;
+    description: string;
+    category: string;
+    order: number;
+    email: string;
+    phone: string;
+    linkedin: string;
+    appointed_date: string;
+    image: File | null;
+}
 
-const form = useForm({
+const form = useForm<LeadershipForm>({
     name: "",
     position: "",
     description: "",
@@ -22,21 +29,19 @@ const form = useForm({
     appointed_date: "",
     image: null,
 });
-/*
-|--------------------------------------------------------------------------
-| Image Preview
-|--------------------------------------------------------------------------
-*/
 
-const imagePreview = ref(null);
+const imagePreview = ref<string | null>(null);
 
-const previewImage = (event) => {
-    const file = event.target.files?.[0];
+const previewImage = (event: Event) => {
+    const input = event.target as HTMLInputElement;
 
-    if (!file) return;
+    if (!input.files?.length) {
+        return;
+    }
+
+    const file = input.files[0];
 
     form.image = file;
-
     imagePreview.value = URL.createObjectURL(file);
 };
 
@@ -45,23 +50,21 @@ const removePhoto = () => {
     imagePreview.value = null;
 };
 
-/*
-|-------------------------------------------------------------------------
-| Submit Form
-|-------------------------------------------------------------------------
-*/
-
 const submit = () => {
-    form.post(route("leadership.store"), {
+    form.post(route("admin.leadership.store"), {
         forceFormData: true,
 
+        preserveScroll: true,
+
+        onSuccess: () => {
+            console.log("Leadership member saved successfully.");
+        },
+
         onError: (errors) => {
-            console.log(errors);
-            alert(JSON.stringify(errors, null, 2));
+            console.error("Failed to save leadership member:", errors);
         },
     });
 };
-
 </script>
     <template>
     <AuthenticatedLayout>
