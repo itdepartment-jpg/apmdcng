@@ -97,7 +97,7 @@ class CarrierController extends Controller
         $carrier->delete();
 
         return redirect()
-            ->route('carriers.index')
+            ->route('admin.carriers.index')
             ->with('success', 'Carrier deleted successfully.');
     }
 }

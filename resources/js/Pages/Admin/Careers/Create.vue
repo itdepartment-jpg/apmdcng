@@ -1,8 +1,31 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import { ref } from "vue";
 
-const form = useForm({
+interface CareerForm {
+    reference_no: string;
+    title: string;
+    department: string;
+    location: string;
+    employment_type: string;
+
+    experience_required: string;
+    education: string;
+    salary: string;
+    vacancies: number;
+    application_deadline: string;
+
+    description: string;
+    responsibilities: string;
+    requirements: string;
+
+    status: string;
+    featured: boolean;
+    job_document: File | null;
+}
+
+const form = useForm<CareerForm>({
     // Career Information
     reference_no: "",
     title: "",
@@ -28,47 +51,43 @@ const form = useForm({
     job_document: null,
 });
 
+const selectedFile = ref<File | null>(null);
+
 const submit = () => {
     form.post(route("admin.careers.store"), {
         forceFormData: true,
     });
 };
 
-import { ref } from "vue";
-
-const selectedFile = ref<File | null>(null);
-
 const onFileSelected = (event: Event) => {
-
     const input = event.target as HTMLInputElement;
 
-    if (!input.files?.length) return;
+    if (!input.files?.length) {
+        return;
+    }
 
-    selectedFile.value = input.files[0];
+    const file = input.files[0];
 
-    form.job_document = input.files[0];
-
+    selectedFile.value = file;
+    form.job_document = file;
 };
 
 const onFileDrop = (event: DragEvent) => {
+    if (!event.dataTransfer?.files.length) {
+        return;
+    }
 
-    if (!event.dataTransfer?.files.length) return;
+    const file = event.dataTransfer.files[0];
 
-    selectedFile.value = event.dataTransfer.files[0];
-
-    form.job_document = event.dataTransfer.files[0];
-
+    selectedFile.value = file;
+    form.job_document = file;
 };
 
 const removeSelectedFile = () => {
-
     selectedFile.value = null;
-
     form.job_document = null;
-
 };
 </script>
-
 <template>
 
     <Head title="Create Career" />

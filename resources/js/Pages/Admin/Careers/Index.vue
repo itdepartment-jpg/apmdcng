@@ -1,27 +1,55 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link, useForm } from "@inertiajs/vue3";
+import { Head, Link, router } from "@inertiajs/vue3";
 
 interface Career {
     id: number;
+    reference_no: string | null;
     title: string;
     department: string;
     location: string;
     employment_type: string;
+
+    experience_required: string | null;
+    education: string | null;
+    salary: string | null;
+    vacancies: number | null;
+
+    application_deadline: string | null;
+
+    description: string | null;
+    responsibilities: string | null;
+    requirements: string | null;
+
+    status: string;
+    featured: boolean;
+    job_document: string | null;
 }
 
-defineProps<{
+const props = defineProps<{
     careers: Career[];
 }>();
 
-import { router } from "@inertiajs/vue3";
-
 const deleteCareer = (id: number) => {
-    if (confirm("Are you sure you want to delete this career?")) {
-        router.delete(route("admin.careers.destroy", id));
+    if (!confirm("Are you sure you want to delete this career?")) {
+        return;
     }
-};
 
+    router.delete(
+        route("admin.careers.destroy", id),
+        {
+            preserveScroll: true,
+
+            onSuccess: () => {
+                console.log("Career deleted successfully.");
+            },
+
+            onError: (errors) => {
+                console.error("Failed to delete career:", errors);
+            },
+        }
+    );
+};
 </script>
 
 <template>

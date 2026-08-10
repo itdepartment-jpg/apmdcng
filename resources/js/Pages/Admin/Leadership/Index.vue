@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { Head } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { ref } from "vue";
-import { usePage } from "@inertiajs/vue3";
-import { Link } from "@inertiajs/vue3";
-import { router } from "@inertiajs/vue3";
-
-const page = usePage();
-const showLeaderModal = ref(false);
+import {
+    Head,
+    Link,
+    router,
+    usePage,
+} from "@inertiajs/vue3";
+import type { PageProps as InertiaPageProps } from "@inertiajs/core";
+import { computed, ref } from "vue";
 
 interface LeadershipMember {
     id: number;
@@ -22,49 +22,73 @@ interface LeadershipMember {
     order: number;
 }
 
+interface FlashProps {
+    success?: string;
+    error?: string;
+}
+
+interface PageProps extends InertiaPageProps {
+    flash?: FlashProps;
+}
+const page = usePage<PageProps>();
+
+const showLeaderModal = ref(false);
+const showDeleteModal = ref(false);
+
+const imagePreview = ref<string | null>(null);
+
 const props = defineProps<{
     executives: LeadershipMember[];
     seniors: LeadershipMember[];
     keyPersonnel: LeadershipMember[];
 }>();
 
-import { computed } from "vue";
-
 const allMembers = computed(() => [
-    ...props.executives.map(member => ({
+    ...props.executives.map((member) => ({
         ...member,
         categoryLabel: "Executive Leadership",
     })),
-    ...props.seniors.map(member => ({
+
+    ...props.seniors.map((member) => ({
         ...member,
         categoryLabel: "Senior Management",
     })),
-    ...props.keyPersonnel.map(member => ({
+
+    ...props.keyPersonnel.map((member) => ({
         ...member,
         categoryLabel: "Key Personnel",
     })),
 ]);
 
-const showDeleteModal = ref(false);
-const selectedLeader = ref(null); 
+const selectedLeader = ref<LeadershipMember | null>(null);
 
-const confirmDelete = (leader) => {
+const confirmDelete = (leader: LeadershipMember) => {
     selectedLeader.value = leader;
     showDeleteModal.value = true;
 };
 
 const deleteLeader = () => {
-    router.delete(route("leadership.destroy", selectedLeader.value.id), {
-        preserveScroll: true,
+    if (!selectedLeader.value) {
+        return;
+    }
 
-        onSuccess: () => {
-            showDeleteModal.value = false;
-            selectedLeader.value = null;
-        },
-    });
+    router.delete(
+        route("leadership.destroy", selectedLeader.value.id),
+        {
+            preserveScroll: true,
+
+            onSuccess: () => {
+                showDeleteModal.value = false;
+                selectedLeader.value = null;
+            },
+
+            onError: (errors) => {
+                console.error("Failed to delete leadership member:", errors);
+            },
+        }
+    );
 };
 </script>
-
 
 <template>
     <Head title="Leadership Management" />

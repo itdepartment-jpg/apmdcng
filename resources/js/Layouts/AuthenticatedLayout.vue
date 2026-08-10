@@ -510,10 +510,8 @@ type AuthUser = {
 // ===============================
 // Sidebar Menu States
 // ===============================
-<<<<<<< HEAD
 const openMenu = ref<string | null>(null);
 const openSubMenu = ref<string | null>(null);
->>>>>>> develop
 
 // Toggle Main Menu
 const toggleMenu = (menu: string) => {
