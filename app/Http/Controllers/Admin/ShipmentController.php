@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Shipment;
 use App\Models\Partner;
 use App\Models\Carrier;
-use App\Models\ShipmentStatus;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Validation\Rule;
 
 class ShipmentController extends Controller
 {
@@ -19,9 +20,11 @@ class ShipmentController extends Controller
         $shipments = Shipment::with([
             'partner',
             'carrier',
-        ])->latest()->paginate(10);
+        ])
+            ->latest()
+            ->paginate(10);
 
-        return inertia('Admin/Shipment/Index', [
+        return Inertia::render('Admin/Shipment/Index', [
             'shipments' => $shipments,
         ]);
     }
@@ -31,7 +34,7 @@ class ShipmentController extends Controller
      */
     public function create()
     {
-        return inertia('Admin/Shipment/Create', [
+        return Inertia::render('Admin/Shipment/Create', [
             'partners' => Partner::orderBy('name')->get(),
             'carriers' => Carrier::orderBy('name')->get(),
         ]);
@@ -43,7 +46,7 @@ class ShipmentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'container_number' => 'required|string|max:255|unique:shipments',
+            'container_number' => 'required|string|max:255|unique:shipments,container_number',
             'container_size'   => 'required|string|max:50',
             'vessel_name'      => 'required|string|max:255',
             'partner_id'       => 'required|exists:partners,id',
@@ -72,7 +75,7 @@ class ShipmentController extends Controller
         Shipment::create($validated);
 
         return redirect()
-            ->route('shipments.index')
+            ->route('admin.shipments.index')
             ->with('success', 'Shipment created successfully.');
     }
 
@@ -81,7 +84,12 @@ class ShipmentController extends Controller
      */
     public function show(Shipment $shipment)
     {
-        //
+        return Inertia::render('Admin/Shipment/Show', [
+            'shipment' => $shipment->load([
+                'partner',
+                'carrier',
+            ]),
+        ]);
     }
 
     /**
@@ -103,28 +111,39 @@ class ShipmentController extends Controller
      * Update the specified shipment.
      */
     public function update(Request $request, Shipment $shipment)
-{
-    $validated = $request->validate([
-        'container_number' => 'required|string|max:255',
-        'container_size'   => 'required|string|max:50',
-        'vessel_name'      => 'required|string|max:255',
-        'partner_id'       => 'required|exists:partners,id',
-        'carrier_id'       => 'required|exists:carriers,id',
-        'status'           => 'required|string|max:255',
-        'eta'              => 'nullable|date',
-    ]);
+    {
+        $validated = $request->validate([
+            'container_number' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('shipments', 'container_number')
+                    ->ignore($shipment->id),
+            ],
+            'container_size' => 'required|string|max:50',
+            'vessel_name'    => 'required|string|max:255',
+            'partner_id'     => 'required|exists:partners,id',
+            'carrier_id'     => 'required|exists:carriers,id',
+            'status'         => 'required|string|max:255',
+            'eta'            => 'nullable|date',
+        ]);
 
-    $shipment->update($validated);
+        $shipment->update($validated);
 
-    return redirect()
-        ->route('shipments.index')
-        ->with('success', 'Shipment updated successfully.');
-}
+        return redirect()
+            ->route('admin.shipments.index')
+            ->with('success', 'Shipment updated successfully.');
+    }
+
     /**
      * Remove the specified shipment.
      */
     public function destroy(Shipment $shipment)
     {
-        //
+        $shipment->delete();
+
+        return redirect()
+            ->route('admin.shipments.index')
+            ->with('success', 'Shipment deleted successfully.');
     }
 }

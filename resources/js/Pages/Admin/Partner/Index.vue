@@ -8,7 +8,7 @@ defineProps({
 
 const deletePartner = (id) => {
     if (confirm("Are you sure you want to delete this partner?")) {
-        router.delete(route("partners.destroy", id));
+        router.delete(route("admin.partners.destroy", id));
     }
 };
 </script>
@@ -32,7 +32,7 @@ const deletePartner = (id) => {
                 </div>
 
                 <Link
-                    :href="route('partners.create')"
+                    :href="route('admin.partners.create')"
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-block"
                 >
                     + New Partner
@@ -94,7 +94,7 @@ const deletePartner = (id) => {
                                 <div class="flex justify-center gap-2">
 
                                     <Link
-                                        :href="route('partners.edit', partner.id)"
+                                        :href="route('admin.partners.edit', partner.id)"
                                         class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
                                     >
                                         Edit

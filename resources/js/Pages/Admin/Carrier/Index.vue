@@ -8,7 +8,7 @@ defineProps({
 
 const deleteCarrier = (id) => {
     if (confirm("Are you sure you want to delete this carrier?")) {
-        router.delete(route("carriers.destroy", id));
+        router.delete(route("admin.carriers.destroy", id));
     }
 };
 </script>
@@ -32,7 +32,7 @@ const deleteCarrier = (id) => {
                 </div>
 
                 <Link
-                    :href="route('carriers.create')"
+                    :href="route('admin.carriers.create')"
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-block"
                 >
                     + New Carrier
@@ -108,7 +108,7 @@ const deleteCarrier = (id) => {
                                 <div class="flex justify-center gap-2">
 
                                     <Link
-                                        :href="route('carriers.edit', carrier.id)"
+                                        :href="route('admin.carriers.edit', carrier.id)"
                                         class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
                                     >
                                         Edit

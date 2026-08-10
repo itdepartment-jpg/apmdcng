@@ -15,6 +15,15 @@ use Inertia\Inertia;
 use App\Http\Controllers\Admin\ShipmentController;
 use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\CarrierController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\CareerController;
+use App\Models\Career;
+use App\Http\Controllers\Admin\CareerApplicationController;
+use App\Http\Controllers\CareerApplicationController as PublicCareerApplicationController;
+use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\CategoryController;
+
+
 
 // Route::get('/', function () {
 //    return Inertia::render('Welcome', [
@@ -94,9 +103,23 @@ Route::get('/sailing-schedules', function () {
 Route::get('rail-freight-services', function () {
     return view('seo-page/rail-freight-services');
 })->name('rail-freight-services');
+
+
 Route::get('career', function () {
-    return view('seo-page/career');
-})->name('career');
+
+    $careers = Career::where('status', 'Open')
+        ->latest()
+        ->get();
+
+    return view('seo-page/career', compact('careers'));
+    })->name('career');
+
+Route::get('career/{career}', function (Career $career) {
+    abort_unless($career->status === 'Open', 404);
+
+    return view('seo-page/career-details', compact('career'));
+})->name('career.details');
+
 
 // Route::get('contact', function () {
 //     return view('seo-page/contact');
@@ -201,10 +224,12 @@ Route::get('/digital', function () { // render
     return Inertia::render('Digital'); // file to render
 })->name('digital'); // url name
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard'); // middleware to authenticate before routing
+Route::middleware(['auth', 'verified'])->group(function () {
 
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+
+});
 // Route::get('/invoice', function () {
 //    return Inertia::render('Invoice');
 // })->middleware(['auth', 'verified'])->name('invoice');
@@ -224,79 +249,218 @@ Route::get('/invoicex', function () {
 Route::get('/team', [LeadershipTeamController::class, 'Bladeindex'])
     ->name('team');
 
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
-    Route::get('/users', [UserController::class, 'index'])
-        ->middleware('can:view users')
-        ->name('admin.users.index');
 
-    Route::get('/users/create', [UserController::class, 'create'])
-        ->name('admin.users.create')
-        ->middleware('can:create users');
+/*
+|--------------------------------------------------------------------------
+| Career Applications
+|--------------------------------------------------------------------------
+*/
 
-    Route::post('/users', [UserController::class, 'store'])
-        ->middleware('can:create users')
-        ->name('admin.users.store');
+Route::get(
+    'career/{career}/apply',
+    [PublicCareerApplicationController::class, 'create']
+)->name('career.apply');
 
-    Route::put('/users/{user}', [UserController::class, 'update'])
-        ->middleware('can:edit users')
-        ->name('admin.users.update');
+Route::post(
+    'career/{career}/apply',
+    [PublicCareerApplicationController::class, 'store']
+)->name('career.apply.store');
 
-    Route::put('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
-        ->name('admin.users.toggle-status')
-        ->middleware('can:edit users');
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'verified'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])
-        ->name('admin.users.destroy')
-        ->middleware('can:delete users');
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard
+        |--------------------------------------------------------------------------
+        */
 
-    Route::resource('shipments', ShipmentController::class);
-    Route::resource('partners', PartnerController::class);
-    Route::resource('carriers', CarrierController::class);
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard');
 
-});
 
-// Profile
-Route::get('/profile', [UserController::class, 'indexProfile'])
-    ->middleware(['auth', 'verified'])
-    ->name('admin.profile.index');
+        /*
+        |--------------------------------------------------------------------------
+        | Users
+        |--------------------------------------------------------------------------
+        */
 
-Route::put('/profile', [UserController::class, 'update_profile'])
-    ->middleware(['auth', 'verified'])
-    ->name('admin.profile.update');
+        Route::controller(UserController::class)
+            ->prefix('users')
+            ->name('users.')
+            ->group(function () {
+
+                Route::get('/', 'index')
+                    ->middleware('can:view users')
+                    ->name('index');
+
+                Route::get('/create', 'create')
+                    ->middleware('can:create users')
+                    ->name('create');
+
+                Route::post('/', 'store')
+                    ->middleware('can:create users')
+                    ->name('store');
+
+                Route::put('/{user}', 'update')
+                    ->middleware('can:edit users')
+                    ->name('update');
+
+                Route::put('/{user}/toggle-status', 'toggleStatus')
+                    ->middleware('can:edit users')
+                    ->name('toggle-status');
+
+                Route::delete('/{user}', 'destroy')
+                    ->middleware('can:delete users')
+                    ->name('destroy');
+
+            });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Logistics
+        |--------------------------------------------------------------------------
+        */
+
+        Route::resource('shipments', ShipmentController::class);
+
+        Route::resource('partners', PartnerController::class);
+
+        Route::resource('carriers', CarrierController::class);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Website CMS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::resource('leadership', LeadershipTeamController::class)
+    ->parameters([
+        'leadership' => 'leadershipTeam',
+    ])
+    ->middleware('can:edit_leadership');
+
+Route::put(
+    'leadership/{leadershipTeam}/order',
+    [LeadershipTeamController::class, 'updateOrder']
+)->name('leadership.update-order');
+
+Route::put(
+    'leadership-header',
+    [LeadershipTeamController::class, 'updateHeader']
+)->name('leadership.update-header');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Careers
+        |--------------------------------------------------------------------------
+        */
+
+        Route::resource('careers', CareerController::class);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Career Applications
+        |--------------------------------------------------------------------------
+        */
+
+        Route::controller(CareerApplicationController::class)
+            ->prefix('career-applications')
+            ->name('career-applications.')
+            ->group(function () {
+
+                Route::get('/', 'index')
+                    ->name('index');
+
+                Route::get('/{careerApplication}', 'show')
+                    ->name('show');
+
+                Route::patch('/{careerApplication}/status', 'updateStatus')
+                    ->name('status');
+
+                Route::delete('/{careerApplication}', 'destroy')
+                    ->name('destroy');
+
+            });
+  /*
+        |--------------------------------------------------------------------------
+        | Blogs or Posts
+        |--------------------------------------------------------------------------
+        */
+        Route::resource('posts', PostController::class);
+
+        Route::resource('categories', CategoryController::class)
+            ->only([
+                'index',
+                'create',
+                'store',
+                'edit',
+                'update',
+                'destroy',
+            ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Roles & Permissions
+        |--------------------------------------------------------------------------
+        */
+
+        Route::middleware('can:manage roles')->group(function () {
+
+            Route::get(
+                '/roles-permissions',
+                [RolePermissionController::class, 'index']
+            )->name('roles-permissions.index');
+
+            Route::post(
+                '/roles-permissions',
+                [RolePermissionController::class, 'store']
+            )->name('roles-permissions.store');
+
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Profile
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/profile',
+            [UserController::class, 'indexProfile']
+        )->name('profile.index');
+
+        Route::put(
+            '/profile',
+            [UserController::class, 'update_profile']
+        )->name('profile.update');
+
+    });
+/*
+|--------------------------------------------------------------------------
+| Laravel Profile Routes
+|--------------------------------------------------------------------------
+*/
+
 Route::patch('/profile', [ProfileController::class, 'update'])
     ->middleware('auth')
     ->name('profile.update');
+
 Route::delete('/profile', [ProfileController::class, 'destroy'])
     ->middleware('auth')
     ->name('profile.destroy');
-
-Route::middleware(['auth', 'verified', 'can:manage roles'])->group(function () {
-    Route::get('/roles-permissions', [RolePermissionController::class, 'index'])->name('roles-permissions.index');
-    Route::post('/roles-permissions', [RolePermissionController::class, 'store'])->name('roles-permissions.store');
-});
-
-// LEADERSHIP MANAGEMENT
-Route::middleware(['auth', 'verified', 'can:edit_leadership'])->group(function () {
-    // Display page
-    Route::get('/edit/leadership', [LeadershipTeamController::class, 'index'])
-        ->name('leadership.index');
-
-    // CRUD operations
-    Route::post('/leadership', [LeadershipTeamController::class, 'store'])
-        ->name('leadership.store');
-    //    Route::put('/leadership/{leadershipTeam}', [LeadershipTeamController::class, 'update'])
-    //        ->name('leadership.update');
-    Route::match(['PUT', 'POST'], 'leadership/{leadershipTeam}', [LeadershipTeamController::class, 'update'])
-        ->name('leadership.update');
-    Route::put('/leadership/{leadershipTeam}/order', [LeadershipTeamController::class, 'updateOrder'])
-        ->name('leadership.update-order');
-    Route::delete('/leadership/{leadershipTeam}', [LeadershipTeamController::class, 'destroy'])
-        ->name('leadership.destroy');
-
-    // Header update
-    Route::put('/leadership-header', [LeadershipTeamController::class, 'updateHeader'])
-        ->name('leadership.update-header');
-});
 
 // ===================
 // NOTES MANAGEMENT

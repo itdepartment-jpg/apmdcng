@@ -27,6 +27,26 @@ class LeadershipTeamController extends Controller
         ]);
     }
 
+    /**
+ * Show the form for creating a new leadership member.
+ */
+public function create()
+{
+    return Inertia::render('Admin/Leadership/Create', [
+        'canEdit' => auth()->user()?->can('edit_leadership') ?? false,
+    ]);
+}
+
+/**
+ * Show the form for editing a leadership member.
+ */
+public function edit(LeadershipTeam $leadershipTeam)
+{
+    return Inertia::render('Admin/Leadership/Edit', [
+        'leader' => $leadershipTeam,
+    ]);
+}
+
     public function cBladeindex11()
     {
         return view('seo-page.team', [

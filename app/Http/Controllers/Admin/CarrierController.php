@@ -45,7 +45,7 @@ class CarrierController extends Controller
         Carrier::create($validated);
 
         return redirect()
-            ->route('carriers.index')
+            ->route('admin.carriers.index')
             ->with('success', 'Carrier created successfully.');
     }
 
@@ -85,7 +85,7 @@ class CarrierController extends Controller
         $carrier->update($validated);
 
         return redirect()
-            ->route('carriers.index')
+            ->route('admin.carriers.index')
             ->with('success', 'Carrier updated successfully.');
     }
 

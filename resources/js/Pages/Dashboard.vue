@@ -1,6 +1,18 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
+
+interface DashboardStats {
+    posts: number;
+    shipments: number;
+    leadership: number;
+    users: number;
+}
+
+defineProps<{
+    stats: DashboardStats;
+}>();
+
 </script>
 
 <template>
@@ -42,90 +54,121 @@ import { Head, Link } from "@inertiajs/vue3";
 
                 </div>
 
-               <!-- =========================================
-                    DASHBOARD OVERVIEW CARDS
-                ========================================= -->
+               <!-- =====================================================
+                    DASHBOARD OVERVIEW
+                ====================================================== -->
 
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
 
-                    <!-- Blog -->
+                    <!-- =================================================
+                        BLOG POSTS
+                    ================================================== -->
+
                     <Link
-                        href="/admin/blog"
-                        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                        :href="route('admin.posts.index')"
+                        class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
+
                         <div>
+
                             <p class="text-sm font-medium text-gray-500">
                                 📝 Blog Posts
                             </p>
 
                             <h2 class="mt-3 text-4xl font-bold text-indigo-600">
-                                0
+                                {{ stats.posts }}
                             </h2>
+
                         </div>
 
                         <p class="mt-8 text-sm font-semibold text-indigo-600">
                             Manage Blog →
                         </p>
+
                     </Link>
 
-                    <!-- Shipments -->
+
+                    <!-- =================================================
+                        SHIPMENTS
+                    ================================================== -->
+
                     <Link
-                        href="/admin/shipments"
-                        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                        :href="route('admin.shipments.index')"
+                        class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
+
                         <div>
+
                             <p class="text-sm font-medium text-gray-500">
                                 🚢 Shipments
                             </p>
 
                             <h2 class="mt-3 text-4xl font-bold text-green-600">
-                                0
+                                {{ stats.shipments }}
                             </h2>
+
                         </div>
 
                         <p class="mt-8 text-sm font-semibold text-green-600">
                             Manage Shipments →
                         </p>
+
                     </Link>
 
-                    <!-- Leadership -->
+
+                    <!-- =================================================
+                        LEADERSHIP
+                    ================================================== -->
+
                     <Link
-                        href="/admin/team"
-                        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                        :href="route('admin.leadership.index')"
+                        class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
+
                         <div>
+
                             <p class="text-sm font-medium text-gray-500">
                                 👥 Leadership
                             </p>
 
                             <h2 class="mt-3 text-4xl font-bold text-blue-600">
-                                0
+                                {{ stats.leadership }}
                             </h2>
+
                         </div>
 
                         <p class="mt-8 text-sm font-semibold text-blue-600">
                             Manage Leadership →
                         </p>
+
                     </Link>
 
-                    <!-- Users -->
+
+                    <!-- =================================================
+                        USERS
+                    ================================================== -->
+
                     <Link
-                        href="/admin/users"
-                        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                        :href="route('admin.users.index')"
+                        class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
+
                         <div>
+
                             <p class="text-sm font-medium text-gray-500">
                                 👤 Users
                             </p>
 
                             <h2 class="mt-3 text-4xl font-bold text-red-600">
-                                0
+                                {{ stats.users }}
                             </h2>
+
                         </div>
 
                         <p class="mt-8 text-sm font-semibold text-red-600">
                             Manage Users →
                         </p>
+
                     </Link>
 
                 </div>

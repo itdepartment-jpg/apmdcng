@@ -46,7 +46,7 @@ class PartnerController extends Controller
         Partner::create($validated);
 
         return redirect()
-            ->route('partners.index')
+            ->route('admin.partners.index')
             ->with('success', 'Partner created successfully.');
     }
 
@@ -85,7 +85,7 @@ class PartnerController extends Controller
         $partner->update($validated);
 
         return redirect()
-            ->route('partners.index')
+            ->route('admin.partners.index')
             ->with('success', 'Partner updated successfully.');
     }
 
@@ -97,7 +97,7 @@ class PartnerController extends Controller
         $partner->delete();
 
         return redirect()
-            ->route('partners.index')
+            ->route('admin.partners.index')
             ->with('success', 'Partner deleted successfully.');
     }
 }

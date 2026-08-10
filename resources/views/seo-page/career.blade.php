@@ -1,3 +1,7 @@
+@php
+    use Illuminate\Support\Str;
+@endphp
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -365,9 +369,9 @@
                 <div class="section-divider mt-6"></div>
             </div>
 
-            <div class="max-w-5xl mx-auto">
+            <!-- <div class="max-w-5xl mx-auto">
                 <!-- Job 1 -->
-                <div class="card-hover bg-white rounded-2xl p-8 shadow-md mb-8" data-aos="fade-up" data-aos-delay="100">
+                <!-- <div class="card-hover bg-white rounded-2xl p-8 shadow-md mb-8" data-aos="fade-up" data-aos-delay="100">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-6">
                         <div>
                             <h3 class="text-2xl font-bold text-gray-800 mb-2">Rail Operations Manager</h3>
@@ -399,87 +403,146 @@
                         <a href="#" class="bg-transparent border border-[#EA222F] text-[#EA222F] font-medium py-3 px-8 rounded-lg transition-all duration-300 hover:bg-[#EA222F] hover:text-white text-center">
                             View Details
                         </a>
-                    </div>
-                </div>
+                    <!-- </div> -->
+            <!--     </div> -->
 
-                <!-- Job 2 -->
-                <div class="card-hover bg-white rounded-2xl p-8 shadow-md mb-8" data-aos="fade-up" data-aos-delay="200">
-                    <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-6">
-                        <div>
-                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Logistics Coordinator</h3>
-                            <div class="flex flex-wrap gap-4 text-gray-600">
-                                <div class="flex items-center">
-                                    <i class="fas fa-map-marker-alt mr-2 text-[#EA222F]"></i>
-                                    <span>Port Harcourt, Nigeria</span>
+                            <!-- =========================================
+                                OPEN POSITIONS
+                            ========================================== -->
+
+                            @forelse($careers as $career)
+
+                                <div
+                                    class="card-hover mb-8 rounded-2xl bg-white p-8 shadow-md"
+                                    data-aos="fade-up"
+                                    data-aos-delay="{{ $loop->iteration * 100 }}"
+                                >
+
+                                    <!-- Job Header -->
+
+                                    <div class="mb-6 flex flex-col justify-between lg:flex-row lg:items-center">
+
+                                        <div>
+
+                                            <h3 class="mb-2 text-2xl font-bold text-gray-800">
+                                                {{ $career->title }}
+                                            </h3>
+
+                                            <div class="flex flex-wrap gap-4 text-gray-600">
+
+                                                <!-- Location -->
+
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-map-marker-alt mr-2 text-[#EA222F]"></i>
+                                                    <span>{{ $career->location }}</span>
+                                                </div>
+
+                                                <!-- Department -->
+
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-briefcase mr-2 text-[#EA222F]"></i>
+                                                    <span>{{ $career->department }}</span>
+                                                </div>
+
+                                                <!-- Employment Type -->
+
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-clock mr-2 text-[#EA222F]"></i>
+                                                    <span>{{ $career->employment_type }}</span>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Career Status -->
+
+                                        <span
+                                            class="job-tag mt-4 rounded-full px-4 py-2 text-sm font-medium lg:mt-0"
+                                        >
+                                            {{ $career->featured ? 'Featured' : 'Open' }}
+                                        </span>
+
+                                    </div>
+
+                                    <!-- Job Description -->
+
+                                    <p class="mb-6 text-gray-600">
+                                        {{ $career->description }}
+                                    </p>
+
+                                    <!-- Actions -->
+
+                                    <div class="flex flex-col gap-4 sm:flex-row">
+
+                                       <a
+                                            href="{{ route('career.apply', $career) }}"
+                                            class="bg-[#EA222F] text-white font-medium py-3 px-8 rounded-lg transition-all duration-300 hover:bg-[#d11a26] text-center"
+                                        >
+                                            Apply Now
+                                        </a>
+
+                                       <a
+                                        href="{{ route('career.details', $career->id) }}"
+                                        class="rounded-lg border border-[#EA222F] bg-transparent px-8 py-3 text-center font-medium text-[#EA222F] transition-all duration-300 hover:bg-[#EA222F] hover:text-white"
+                                    >
+                                        View Details
+                                    </a>
+
+                                    </div>
+
                                 </div>
-                                <div class="flex items-center">
-                                    <i class="fas fa-briefcase mr-2 text-[#EA222F]"></i>
-                                    <span>Operations</span>
+
+                            @empty
+
+                                <!-- No Open Positions -->
+
+                                <div
+                                    class="rounded-2xl bg-white p-12 text-center shadow-md"
+                                    data-aos="fade-up"
+                                >
+
+                                    <div class="mb-5 text-5xl text-[#303791]">
+                                        <i class="fas fa-briefcase"></i>
+                                    </div>
+
+                                    <h3 class="mb-3 text-2xl font-bold text-gray-800">
+                                        No Open Positions
+                                    </h3>
+
+                                    <p class="mx-auto max-w-xl text-gray-600">
+                                        We currently don't have any open career opportunities.
+                                        Please check back later for new opportunities.
+                                    </p>
+
                                 </div>
-                                <div class="flex items-center">
-                                    <i class="fas fa-clock mr-2 text-[#EA222F]"></i>
-                                    <span>Full-time</span>
-                                </div>
-                            </div>
+
+                            @endforelse
+
                         </div>
-                        <span class="job-tag text-sm font-medium py-2 px-4 rounded-full mt-4 lg:mt-0">New</span>
-                    </div>
-                    <p class="text-gray-600 mb-6">
-                        We're seeking a detail-oriented Logistics Coordinator to manage shipment scheduling, tracking, and customer communication. 
-                        Experience in freight forwarding or supply chain management preferred. This role requires excellent organizational skills and the ability to manage multiple priorities.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="#" class="bg-[#EA222F] text-white font-medium py-3 px-8 rounded-lg transition-all duration-300 hover:bg-[#d11a26] text-center">
-                            Apply Now
-                        </a>
-                        <a href="#" class="bg-transparent border border-[#EA222F] text-[#EA222F] font-medium py-3 px-8 rounded-lg transition-all duration-300 hover:bg-[#EA222F] hover:text-white text-center">
-                            View Details
-                        </a>
-                    </div>
-                </div>
 
-                <!-- Job 3 -->
-                <div class="card-hover bg-white rounded-2xl p-8 shadow-md" data-aos="fade-up" data-aos-delay="300">
-                    <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-6">
-                        <div>
-                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Software Developer</h3>
-                            <div class="flex flex-wrap gap-4 text-gray-600">
-                                <div class="flex items-center">
-                                    <i class="fas fa-map-marker-alt mr-2 text-[#EA222F]"></i>
-                                    <span>Remote / Lagos, Nigeria</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="fas fa-briefcase mr-2 text-[#EA222F]"></i>
-                                    <span>Technology</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="fas fa-clock mr-2 text-[#EA222F]"></i>
-                                    <span>Full-time</span>
-                                </div>
-                            </div>
+                        <!-- General Application -->
+
+                        <div
+                            class="mt-16 text-center"
+                            data-aos="fade-up"
+                        >
+
+                            <p class="mb-8 text-lg text-gray-600">
+                                Don't see the perfect role for you?
+                            </p>
+
+                            <a
+                                href="#"
+                                class="inline-flex items-center justify-center rounded-full border-2 border-[#EA222F] px-10 py-4 text-lg font-semibold text-[#EA222F] transition-all duration-300 hover:bg-[#EA222F] hover:text-white"
+                            >
+                                <i class="fas fa-paper-plane mr-3"></i>
+
+                                Submit Your Resume
+
+                            </a>
+
                         </div>
-                        <span class="job-tag text-sm font-medium py-2 px-4 rounded-full mt-4 lg:mt-0">Remote</span>
-                    </div>
-                    <p class="text-gray-600 mb-6">
-                        Join our technology team to develop and maintain our logistics platforms, tracking systems, and customer portals. 
-                        Proficiency in JavaScript, Python, or PHP required. Experience with logistics software is a plus. You'll work in an agile environment with a focus on innovation.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="#" class="bg-[#EA222F] text-white font-medium py-3 px-8 rounded-lg transition-all duration-300 hover:bg-[#d11a26] text-center">
-                            Apply Now
-                        </a>
-                        <a href="#" class="bg-transparent border border-[#EA222F] text-[#EA222F] font-medium py-3 px-8 rounded-lg transition-all duration-300 hover:bg-[#EA222F] hover:text-white text-center">
-                            View Details
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center mt-16" data-aos="fade-up">
-                <p class="text-gray-600 mb-8 text-lg">Don't see the perfect role for you?</p>
-                <a href="#" class="bg-transparent border-2 border-[#EA222F] text-[#EA222F] font-semibold py-4 px-10 rounded-full transition-all duration-300 hover:bg-[#EA222F] hover:text-white inline-flex items-center justify-center text-lg">
-                    <i class="fas fa-paper-plane mr-3"></i> Submit Your Resume
-                </a>
             </div>
         </div>
     </section>

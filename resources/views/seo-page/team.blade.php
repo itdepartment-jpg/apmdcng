@@ -82,6 +82,7 @@
 </head>
 
 <body class="bg-[#FAFAFA] text-gray-800 antialiased overflow-x-hidden">
+
     @php
         $formatTeamDescription = static function (?string $description): ?string {
             if (! $description) {
@@ -164,252 +165,630 @@
         </section>
     @endif
 
-    <!-- Leadership Team Section -->
-    <section id="leadership" class="py-20 bg-white">
-        <div class="container mx-auto px-6">
-            @if ($hasTeamMembers)
-                @if ($hasExecutives)
-                    <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
-                        <span class="text-[#EA222F] font-semibold tracking-wider">LEADERSHIP</span>
-                        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mt-3 mb-6">
-                            Executive Leadership Team
-                        </h2>
-                        <p class="text-gray-600">
-                            Our experienced leadership team brings decades of maritime expertise and strategic vision to
-                            drive APMDC's success.
-                        </p>
-                    </div>
+    <!-- ==========================================================
+        EXECUTIVE LEADERSHIP
+    =========================================================== -->
 
-                    <!-- Dynamic Leadership Team Section -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        @foreach ($executives as $index => $executive)
-                            <div class="team-card bg-white rounded-xl shadow-md overflow-hidden" data-aos="fade-up"
-                                data-aos-delay="{{ ($index + 1) * 100 }}">
-                                <div class="relative overflow-hidden">
-                                    <!-- Position Badge with Fallback -->
-                                    <div class="leadership-badge">
-                                        {{ $executive->position_short ?? (Str::limit(strtoupper($executive->position), 5) ?? 'EXEC') }}
+              @if($hasExecutives)
+
+                @php
+                    $featuredLeaders = $executives->take(2);
+                    $executiveLeaders = $executives->skip(2);
+                @endphp
+
+                <section class="py-12">
+
+                    <div class="max-w-5xl mx-auto px-6">
+
+                        <!-- Section Header -->
+                        <div class="mb-12 text-center">
+
+                            <span class="font-semibold uppercase tracking-[4px] text-[#EA222F]">
+                                Executive Leadership
+                            </span>
+
+                            <h2 class="mt-3 text-4xl font-bold text-[#1B1F3B] lg:text-5xl">
+                                Our Executive Leadership
+                            </h2>
+
+                            <p class="mx-auto mt-5 max-w-3xl leading-8 text-gray-600">
+                                Meet the executives providing strategic leadership and driving
+                                APMDC's commitment to operational excellence across the maritime
+                                and logistics industry.
+                            </p>
+
+                        </div>
+
+                        <!-- Featured Leaders -->
+                        <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+
+                            @foreach($featuredLeaders as $index => $leader)
+
+                                @php
+
+                                    $imageUrl = $leader->image_url
+                                        ?? ($leader->image
+                                            ? asset('storage/'.$leader->image)
+                                            : ($leader->image_path
+                                                ? asset('storage/'.$leader->image_path)
+                                                : null));
+
+                                    $bio = $formatTeamDescription(
+                                        $leader->bio ?? $leader->description
+                                    );
+
+                                    $defaultBio = 'Experienced maritime executive providing strategic leadership and operational excellence.';
+
+                                @endphp
+
+                              <article
+                                    class="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xl transition duration-500 hover:shadow-2xl cursor-pointer"
+                                   onclick="openExecutivePopup(
+                                        '{{ $leader->name }}',
+                                        '{{ $leader->position }}',
+                                        '{{ $imageUrl }}',
+                                        @js($bio),
+                                        '{{ $leader->email }}',
+                                        '{{ $leader->linkedin }}'
+                                    )"
+                                >
+
+                                    <!-- ==========================================
+                                        LEADER PHOTO
+                                    ========================================== -->
+                                    <div class="overflow-hidden">
+
+                                        @if($imageUrl)
+
+                                            <img
+                                                src="{{ $imageUrl }}"
+                                                alt="{{ $leader->name }}"
+                                                class="h-[420px] w-full object-cover transition duration-500 hover:scale-105">
+
+                                        @else
+
+                                            <div class="flex h-[420px] items-center justify-center bg-gray-100">
+
+                                                <i class="fas fa-user text-7xl text-gray-300"></i>
+
+                                            </div>
+
+                                        @endif
+
                                     </div>
 
+                                    <!-- ==========================================
+                                        LEADER INFORMATION
+                                    ========================================== -->
+                                    <div class="p-8 text-center">
+
+                                        <h3 class="text-2xl font-bold text-[#1B1F3B]">
+
+                                            {{ $leader->name }}
+
+                                        </h3>
+
+                                        <p class="mt-2 text-lg font-medium text-[#EA222F]">
+
+                                            {{ $leader->position }}
+
+                                        </p>
+
+                                        <div class="mx-auto my-5 h-1 w-16 rounded-full bg-[#EA222F]"></div>
+
+                                        <!-- Social Links -->
+                                        <div class="flex items-center justify-center gap-4">
+
+                                            @if($leader->email)
+
+                                                <a
+                                                    href="mailto:{{ $leader->email }}"
+                                                    class="flex h-11 w-11 items-center justify-center rounded-full bg-[#303791] text-white transition-all duration-300 hover:scale-110 hover:bg-[#EA222F]">
+
+                                                    <i class="fas fa-envelope"></i>
+
+                                                </a>
+
+                                            @endif
+
+                                            @if($leader->linkedin)
+
+                                                <a
+                                                    href="{{ $leader->linkedin }}"
+                                                    target="_blank"
+                                                    class="flex h-11 w-11 items-center justify-center rounded-full border border-[#303791] text-[#303791] transition-all duration-300 hover:scale-110 hover:bg-[#303791] hover:text-white">
+
+                                                    <i class="fab fa-linkedin-in"></i>
+
+                                                </a>
+
+                                            @endif
+
+                                        </div>
+
+                                    </div>
+
+                                </article>
+
+                            @endforeach
+
+                        </div>
+
+                    </div>
+
+
+                </section>
+
+            @endif
+
+                        <!-- ==========================================================
+                        SENIOR LEADERSHIP
+                    =========================================================== -->
+
+                   @if($hasSeniors)
+
+<section class="bg-white py-20">
+
+    <div class="mx-auto max-w-7xl px-6">
+
+        <!-- ==========================================
+            Section Header
+        ========================================== -->
+        <div class="mb-16 text-center">
+
+            <span class="font-semibold uppercase tracking-[4px] text-[#EA222F]">
+
+                Senior Leadership
+
+            </span>
+
+            <h2 class="mt-3 text-4xl font-bold text-[#1B1F3B] lg:text-5xl">
+
+                Senior Management Team
+
+            </h2>
+
+            <p class="mx-auto mt-5 max-w-3xl leading-8 text-gray-600">
+
+                Meet the experienced professionals leading APMDC's operations,
+                commercial activities, technical services, and strategic business
+                functions.
+
+            </p>
+
+        </div>
+
+        <!-- ==========================================
+            Leadership Grid
+        ========================================== -->
+       <div class="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-3">
+
+            @foreach($seniors as $leader)
+
+                @php
+
+                    $imageUrl = $leader->image_url
+                        ?? ($leader->image
+                            ? asset('storage/'.$leader->image)
+                            : ($leader->image_path
+                                ? asset('storage/'.$leader->image_path)
+                                : null));
+
+                    $bio = $formatTeamDescription(
+                        $leader->bio ?? $leader->description
+                    );
+
+                @endphp
+
+                <article
+                    onclick="openExecutivePopup(
+                        '{{ $leader->name }}',
+                        '{{ $leader->position }}',
+                        '{{ $imageUrl }}',
+                        @js($bio),
+                        '{{ $leader->email }}',
+                        '{{ $leader->linkedin }}'
+                    )"
+                    class="cursor-pointer overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
+
+                    <!-- =========================
+                        Leader Photo
+                    ========================== -->
+                    <div class="overflow-hidden">
+
+                        @if($imageUrl)
+
+                            <img
+                                src="{{ $imageUrl }}"
+                                alt="{{ $leader->name }}"
+                                class="h-80 w-full object-cover transition duration-500 hover:scale-105">
+
+                        @else
+
+                            <div class="flex h-80 items-center justify-center bg-gray-100">
+
+                                <i class="fas fa-user text-6xl text-gray-300"></i>
+
+                            </div>
+
+                        @endif
+
+                    </div>
+
+                    <!-- =========================
+                        Leader Information
+                    ========================== -->
+                    <div class="p-6 text-center">
+
+                        <h3 class="text-2xl font-bold text-[#1B1F3B]">
+
+                            {{ $leader->name }}
+
+                        </h3>
+
+                        <p class="mt-2 font-medium text-[#EA222F]">
+
+                            {{ $leader->position }}
+
+                        </p>
+
+                        <div class="mx-auto my-5 h-1 w-16 rounded-full bg-[#EA222F]"></div>
+
+                        <!-- Social Links -->
+                        <div class="flex items-center justify-center gap-4">
+
+                            @if($leader->email)
+
+                                <a
+                                    href="mailto:{{ $leader->email }}"
+                                    onclick="event.stopPropagation()"
+                                    class="flex h-11 w-11 items-center justify-center rounded-full bg-[#303791] text-white transition-all duration-300 hover:scale-110 hover:bg-[#EA222F]">
+
+                                    <i class="fas fa-envelope"></i>
+
+                                </a>
+
+                            @endif
+
+                            @if($leader->linkedin)
+
+                                <a
+                                    href="{{ $leader->linkedin }}"
+                                    target="_blank"
+                                    onclick="event.stopPropagation()"
+                                    class="flex h-11 w-11 items-center justify-center rounded-full border border-[#303791] text-[#303791] transition-all duration-300 hover:scale-110 hover:bg-[#303791] hover:text-white">
+
+                                    <i class="fab fa-linkedin-in"></i>
+
+                                </a>
+
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            @endforeach
+
+        </div>
+
+    </div>
+
+</section>
+
+@endif
+
+                    <!-- ==========================================================
+                        KEY PERSONNEL
+                    =========================================================== -->
+
+                    @if($hasKeyPersonnel)
+
+                    <section class="py-20 bg-gray-50">
+
+                        <div class="max-w-7xl mx-auto px-6">
+
+                            <!-- Heading -->
+
+                            <div class="text-center mb-14">
+
+                                <span class="inline-block text-[#EA222F] uppercase tracking-[4px] font-semibold">
+                                    Key Personnel
+                                </span>
+
+                                <h2 class="text-4xl font-bold text-[#1B1F3B] mt-3">
+                                    Operational & Technical Team
+                                </h2>
+
+                                <p class="text-gray-600 mt-5 max-w-3xl mx-auto leading-8">
+                                    Meet the dedicated professionals working behind the scenes to
+                                    deliver efficient, reliable and customer-focused maritime,
+                                    shipping and logistics services every day.
+                                </p>
+
+                            </div>
+
+                            <!-- Team Members -->
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+
+                                @foreach($keyPersonnel as $member)
+
                                     @php
-                                        $imageUrl = $executive->image_url ?? ($executive->image ? asset('storage/' . $executive->image) : null);
+
+                                        $imageUrl = $member->image_url ??
+                                            ($member->image
+                                                ? asset('storage/'.$member->image)
+                                                : ($member->image_path
+                                                    ? asset('storage/'.$member->image_path)
+                                                    : null));
+
+                                        $bio = $formatTeamDescription(
+                                            $member->bio ??
+                                            $member->description
+                                        );
+
                                     @endphp
 
-                                    @if ($imageUrl)
-                                        <img src="{{ $imageUrl }}"
-                                            alt="{{ $executive->name ?? 'Executive Team Member' }}"
-                                            class="team-member-img w-full h-80 object-cover">
-                                    @endif
+                                   <div
+                                        class="group cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-2"
+                                    >
+
+                                        @if($imageUrl)
+
+                                            <img
+                                                src="{{ $imageUrl }}"
+                                                alt="{{ $member->name }}"
+                                                class="w-full h-64 object-cover">
+
+                                        @endif
+
+                                        <div class="p-6">
+
+                                            <h3
+                                                class="text-xl font-bold text-[#1B1F3B]">
+
+                                                {{ $member->name }}
+
+                                            </h3>
+
+                                            <p
+                                                class="text-[#EA222F] font-medium mt-2">
+
+                                                {{ $member->position }}
+
+                                            </p>
+
+                                            <div
+                                                class="w-10 h-1 bg-[#EA222F] rounded-full my-4">
+                                            </div>
+
+                                            <p
+                                                class="text-gray-600 text-sm leading-7">
+
+                                                {{ $bio }}
+
+                                            </p>
+
+                                            <div
+                                                class="flex justify-center gap-5 mt-6">
+
+                                                @if($member->email)
+
+                                                    <a
+                                                        href="mailto:{{ $member->email }}"
+                                                        class="text-[#303791] hover:text-[#EA222F]">
+
+                                                        <i class="fas fa-envelope"></i>
+
+                                                    </a>
+
+                                                @endif
+
+                                                @if($member->linkedin)
+
+                                                    <a
+                                                        href="{{ $member->linkedin }}"
+                                                        target="_blank"
+                                                        class="text-[#303791] hover:text-[#EA222F]">
+
+                                                        <i class="fab fa-linkedin"></i>
+
+                                                    </a>
+
+                                                @endif
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                @endforeach
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <!-- ==========================================
+                        LEADERSHIP PROFILE MODAL
+                    ========================================== -->
+
+                    <!-- <div
+                        id="leaderModal"
+                        class="fixed inset-0 z-[9999] flex items-center justify-center bg-red-500/80"
+                    >
+
+                        <div
+                            class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl mx-6 p-10 relative">
+
+                            <!-- Close Button -->
+
+                           <!-- <button
+                                type="button"
+                                onclick="closeExecutivePopup()"
+                                class="absolute top-6 right-6 flex h-12 w-12 items-center justify-center rounded-full bg-white text-2xl font-light text-gray-500 shadow-lg transition-all duration-300 hover:bg-[#EA222F] hover:text-white">
+
+                                &times;
+
+                            </button>
+
+                            <h2 class="text-3xl font-bold text-[#1B1F3B]">
+                                Leadership Profile
+                            </h2>
+
+                            <p class="mt-3 text-gray-500">
+                                Modal Successfully Created.
+                            </p>
+
+                        </div>
+ -->
+                  <!--   </div> --> -->
+
+                    @endif
+
+            <!-- Join Our Team CTA -->
+            <section class="py-20 bg-gradient-to-r from-[#303791] to-[#EA222F] text-white">
+                <div class="container mx-auto px-6">
+                    <div class="max-w-4xl mx-auto text-center" data-aos="fade-up">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-6">
+                            Join Our Growing Team
+                        </h2>
+                        <p class="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
+                            Are you passionate about maritime excellence? Explore career opportunities with APMDC and be part of
+                            our innovative team.
+                        </p>
+                        <div class="flex flex-col sm:flex-row justify-center gap-4">
+                            <a href="mailto:careers@apmdcng.com"
+                                class="bg-white text-[#EA222F] font-bold py-4 px-8 rounded-xl transition-all duration-300 hover:bg-gray-100 hover:shadow-xl transform hover:-translate-y-1 inline-flex items-center justify-center">
+                                <i class="fas fa-paper-plane mr-3"></i> Send Your CV
+                            </a>
+                            <a href="/career"
+                                class="bg-transparent border-2 border-white text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 hover:bg-white hover:text-[#EA222F] inline-flex items-center justify-center">
+                                <i class="fas fa-briefcase mr-3"></i> View Open Positions
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+           <!-- ==========================================
+                    EXECUTIVE PROFILE POPUP
+                ========================================== -->
+
+                <div
+                    id="executivePopup"
+                    style="display:none;"
+                    onclick="closeExecutivePopup()"
+                    class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm overflow-y-auto">
+
+                    <div class="flex min-h-screen items-center justify-center p-6">
+
+                        <div class="relative w-full max-w-6xl rounded-3xl bg-white shadow-2xl overflow-hidden">
+
+                            <!-- Close Button -->
+                            <button
+                                onclick="closeExecutivePopup()"
+                                class="absolute right-6 top-6 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-2xl text-gray-500 transition hover:bg-[#EA222F] hover:text-white">
+
+                                &times;
+
+                            </button>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-2">
+
+                                <!-- ======================================
+                                    LEFT SIDE - PHOTO
+                                ======================================= -->
+
+                                <div class="bg-gray-50 p-10 flex items-center justify-center">
+
+                                    <img
+                                        id="executivePhoto"
+                                        src=""
+                                        alt=""
+                                        class="w-full max-w-sm rounded-3xl shadow-xl object-cover">
+
                                 </div>
 
-                                <div class="p-6">
-                                    <!-- Name with Fallback -->
-                                    <h3 class="text-xl font-bold text-gray-800 mb-1">
-                                        {{ $executive->name ?? 'Executive Team Member' }}
+                                <!-- ======================================
+                                    RIGHT SIDE - INFORMATION
+                                ======================================= -->
+
+                                <div class="p-10 lg:p-14">
+
+                                    <span class="uppercase tracking-[4px] text-[#EA222F] text-sm font-semibold">
+
+                                        Executive Leadership
+
+                                    </span>
+
+                                    <h2
+                                        id="executiveName"
+                                        class="mt-4 text-4xl font-bold text-[#1B1F3B]">
+                                    </h2>
+
+                                    <p
+                                        id="executivePosition"
+                                        class="mt-3 text-xl font-medium text-[#EA222F]">
+                                    </p>
+
+                                    <!-- Social Links -->
+
+                                    <div class="mt-8 flex gap-4">
+
+                                        <a
+                                            id="executiveEmail"
+                                            href="#"
+                                            class="flex h-12 w-12 items-center justify-center rounded-full bg-[#303791] text-white transition hover:bg-[#EA222F]">
+
+                                            <i class="fas fa-envelope"></i>
+
+                                        </a>
+
+                                        <a
+                                            id="executiveLinkedIn"
+                                            href="#"
+                                            target="_blank"
+                                            class="flex h-12 w-12 items-center justify-center rounded-full border border-[#303791] text-[#303791] transition hover:bg-[#303791] hover:text-white">
+
+                                            <i class="fab fa-linkedin-in"></i>
+
+                                        </a>
+
+                                    </div>
+
+                                    <!-- Divider -->
+
+                                    <div class="my-8 h-px bg-gray-200"></div>
+
+                                    <!-- Biography -->
+
+                                    <h3 class="text-lg font-semibold text-[#1B1F3B]">
+
+                                        Biography
+
                                     </h3>
 
-                                    <!-- Position with Fallback -->
-                                    <p class="text-[#EA222F] font-medium mb-3">
-                                        {{ $executive->position ?? 'Executive Leadership' }}
-                                    </p>
-
-                                    <!-- Bio/Description with Fallback -->
-                                    @php
-                                        $bio = $executive->bio ?? ($executive->description ?? null);
-                                        $bioText = $formatTeamDescription($bio);
-                                        $defaultBio =
-                                            'Experienced professional with extensive background in maritime operations and leadership.';
-                                    @endphp
-
-                                    <p class="team-description text-gray-600 text-sm mb-4">
-                                        {{ $bioText ?: $defaultBio }}
-                                    </p>
-
-
+                                    <div
+                                        id="executiveBio"
+                                        class="mt-6 max-h-[350px] overflow-y-auto pr-3 leading-8 text-gray-600">
+                                    </div>
 
                                 </div>
+
                             </div>
-                        @endforeach
-                    </div>
-                @endif
 
-                <!-- Senior Leadership Section -->
-                @if ($hasSeniors)
-                <div class="mt-16">
-                    <div class="text-center max-w-3xl mx-auto mb-12" data-aos="fade-up">
-                        <span class="text-[#EA222F] font-semibold tracking-wider">SENIOR LEADERSHIP</span>
-                        <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mt-3 mb-4">
-                            Senior Management Team
-                        </h3>
-                        <p class="text-gray-600">
-                            Experienced professionals overseeing key operational divisions
-                        </p>
+                        </div>
+
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        @foreach ($seniors as $index => $senior)
-                            <div class="team-card bg-white rounded-xl shadow-sm p-6 text-center" data-aos="fade-up"
-                                data-aos-delay="{{ ($index + 1) * 100 }}">
-
-                                @php
-                                    $seniorImageUrl = $senior->image_url ?? ($senior->image ? asset('storage/' . $senior->image) : null);
-                                @endphp
-
-                                @if ($seniorImageUrl)
-                                    <div
-                                        class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-[#EA222F] bg-gray-100">
-                                        <img src="{{ $seniorImageUrl }}"
-                                            alt="{{ $senior->name ?? 'Senior Team Member' }}"
-                                            class="w-full h-full object-cover">
-                                    </div>
-                                @endif
-
-                                <h4 class="font-bold text-gray-800 mb-1">
-                                    {{ $senior->name ?? 'Senior Leadership' }}
-                                </h4>
-                                <p class="text-[#EA222F] text-sm mb-3">
-                                    {{ $senior->position ?? 'Senior Management' }}
-                                </p>
-
-                                @php
-                                    $seniorBio =
-                                        $senior->bio ??
-                                        ($senior->description ??
-                                            'Experienced professional managing key operational areas and driving team success.');
-                                    $seniorBioText = $formatTeamDescription($seniorBio);
-                                @endphp
-
-                                <p class="team-description text-gray-600 text-xs mb-4">
-                                    {{ $seniorBioText }}
-                                </p>
-
-                                @if ($senior->department)
-                                    <div
-                                        class="bg-gray-100 rounded-full px-3 py-1 text-xs font-medium text-gray-700 inline-block">
-                                        {{ $senior->department }}
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
                 </div>
-                @endif
-
-                <!-- Key Personnel Section -->
-                @if ($hasKeyPersonnel)
-                <div class="mt-16">
-                    <div class="text-center max-w-3xl mx-auto mb-12" data-aos="fade-up">
-                        <span class="text-[#EA222F] font-semibold tracking-wider">KEY PERSONNEL</span>
-                        <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mt-3 mb-4">
-                            Technical & Operational Experts
-                        </h3>
-                        <p class="text-gray-600">
-                            Specialized professionals driving operational excellence
-                        </p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @foreach ($keyPersonnel as $index => $personnel)
-                            <div class="team-card bg-white rounded-xl shadow-sm p-6" data-aos="fade-up"
-                                data-aos-delay="{{ ($index + 1) * 100 }}">
-                                <div class="flex items-start">
-                                    @php
-                                        $personnelImageUrl = $personnel->image_url ?? ($personnel->image ? asset('storage/' . $personnel->image) : null);
-                                    @endphp
-
-                                    @if ($personnelImageUrl)
-                                        <div
-                                            class="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 mr-4 border-2 border-[#303791] bg-gray-100">
-                                            <img src="{{ $personnelImageUrl }}"
-                                                alt="{{ $personnel->name ?? 'Team Member' }}"
-                                                class="w-full h-full object-cover">
-                                        </div>
-                                    @endif
-
-                                    <div class="flex-1">
-                                        <h4 class="font-bold text-gray-800 mb-1">
-                                            {{ $personnel->name ?? 'Expert Team Member' }}
-                                        </h4>
-                                        <p class="text-[#EA222F] text-sm mb-2">
-                                            {{ $personnel->position ?? 'Technical Specialist' }}
-                                        </p>
-
-                                        @php
-                                            $personnelBio =
-                                                $personnel->bio ??
-                                                ($personnel->description ??
-                                                    'Skilled professional with expertise in specialized operational areas.');
-                                            $personnelBioText = $formatTeamDescription($personnelBio);
-                                        @endphp
-
-                                        <p class="team-description text-gray-600 text-xs mb-3">
-                                            {{ $personnelBioText }}
-                                        </p>
-
-                                        @php
-                                            $specializations = $personnel->specialization
-                                                ? array_map('trim', explode(',', $personnel->specialization))
-                                                : [];
-                                        @endphp
-
-                                        @if (count($specializations) > 0)
-                                            <div class="flex flex-wrap gap-1">
-                                                @foreach (array_slice($specializations, 0, 3) as $skill)
-                                                    <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
-                                                        {{ $skill }}
-                                                    </span>
-                                                @endforeach
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-                @endif
-            @else
-                <div class="max-w-3xl mx-auto text-center py-16" data-aos="fade-up">
-                    <span class="text-[#EA222F] font-semibold tracking-wider">OUR TEAM</span>
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mt-3 mb-6">
-                        We're Updating Our Team Profiles
-                    </h2>
-                    <p class="text-gray-600 text-lg leading-relaxed">
-                        Our leadership and operations team information is being refreshed. Please check back soon for
-                        updated profiles of the people driving APMDC's maritime and logistics services.
-                    </p>
-                </div>
-            @endif
-        </div>
-    </section>
-
-
-
-    <!-- Join Our Team CTA -->
-    <section class="py-20 bg-gradient-to-r from-[#303791] to-[#EA222F] text-white">
-        <div class="container mx-auto px-6">
-            <div class="max-w-4xl mx-auto text-center" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold mb-6">
-                    Join Our Growing Team
-                </h2>
-                <p class="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-                    Are you passionate about maritime excellence? Explore career opportunities with APMDC and be part of
-                    our innovative team.
-                </p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="mailto:careers@apmdcng.com"
-                        class="bg-white text-[#EA222F] font-bold py-4 px-8 rounded-xl transition-all duration-300 hover:bg-gray-100 hover:shadow-xl transform hover:-translate-y-1 inline-flex items-center justify-center">
-                        <i class="fas fa-paper-plane mr-3"></i> Send Your CV
-                    </a>
-                    <a href="#"
-                        class="bg-transparent border-2 border-white text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 hover:bg-white hover:text-[#EA222F] inline-flex items-center justify-center">
-                        <i class="fas fa-briefcase mr-3"></i> View Open Positions
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Footer -->
     <!-- Note: In a real implementation, you would include your footer partial here -->
     @include('partials.footer')
@@ -425,6 +804,32 @@
             <path d="M18 15l-6-6-6 6" />
         </svg>
     </button>
+
+   <script>
+
+        function openExecutivePopup(name, position, image, bio, email, linkedin) {
+
+        document.getElementById("executiveName").innerText = name;
+
+        document.getElementById("executivePosition").innerText = position;
+
+        document.getElementById("executivePhoto").src = image;
+
+        document.getElementById("executiveBio").innerText = bio;
+
+        document.getElementById("executiveEmail").href = "mailto:" + email;
+
+        document.getElementById("executiveLinkedIn").href = linkedin;
+
+        document.getElementById("executivePopup").style.display = "block";
+    }
+
+        function closeExecutivePopup() {
+
+            document.getElementById("executivePopup").style.display = "none";
+
+        }
+    </script>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>

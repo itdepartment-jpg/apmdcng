@@ -18,3 +18,10 @@ __MACOSX
 /storage/logs/*
 /storage/app/*
 /storage/debugbar/*
+
+# Laravel generated / local files
+/public/hot
+/public/storage
+
+# Generated archives
+/public/build.zip
