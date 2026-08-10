@@ -15,6 +15,7 @@ interface LeadershipForm {
     linkedin: string;
     appointed_date: string;
     image: File | null;
+    display_order: number;
 }
 
 const form = useForm<LeadershipForm>({
@@ -28,6 +29,7 @@ const form = useForm<LeadershipForm>({
     linkedin: "",
     appointed_date: "",
     image: null,
+    display_order: 1,
 });
 
 const imagePreview = ref<string | null>(null);
