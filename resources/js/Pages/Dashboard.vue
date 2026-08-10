@@ -94,11 +94,9 @@ defineProps<{
 
                     <Link
                         :href="route('admin.shipments.index')"
-                        class="group bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
-
                         <div>
-
                             <p class="text-sm font-medium text-gray-500">
                                 🚢 Shipments
                             </p>
@@ -106,15 +104,12 @@ defineProps<{
                             <h2 class="mt-3 text-4xl font-bold text-green-600">
                                 {{ stats.shipments }}
                             </h2>
-
                         </div>
 
                         <p class="mt-8 text-sm font-semibold text-green-600">
                             Manage Shipments →
                         </p>
-
                     </Link>
-
 
                     <!-- =================================================
                         LEADERSHIP
