@@ -20,6 +20,9 @@ use App\Http\Controllers\Admin\CareerController;
 use App\Models\Career;
 use App\Http\Controllers\Admin\CareerApplicationController;
 use App\Http\Controllers\CareerApplicationController as PublicCareerApplicationController;
+use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\CategoryController;
+
 
 
 // Route::get('/', function () {
@@ -390,7 +393,22 @@ Route::put(
                     ->name('destroy');
 
             });
+  /*
+        |--------------------------------------------------------------------------
+        | Blogs or Posts
+        |--------------------------------------------------------------------------
+        */
+        Route::resource('posts', PostController::class);
 
+        Route::resource('categories', CategoryController::class)
+            ->only([
+                'index',
+                'create',
+                'store',
+                'edit',
+                'update',
+                'destroy',
+            ]);
 
         /*
         |--------------------------------------------------------------------------

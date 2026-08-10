@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -86,5 +87,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+ * Blog posts authored by this user.
+ */
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class, 'author_id');
     }
 }

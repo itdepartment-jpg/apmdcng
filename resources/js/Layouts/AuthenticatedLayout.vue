@@ -482,6 +482,7 @@ import CommunicationSidebar from "@/Components/Sidebar/CommunicationSidebar.vue"
 import AccountSidebar from "@/Components/Sidebar/AccountSidebar.vue";
 import AdministrationSidebar from "@/Components/Sidebar/AdministrationSidebar.vue";
 import CareerSidebar from "@/Components/Sidebar/CareerSidebar.vue";
+import { watch } from 'vue';
 
 import {
     initAccordions,
@@ -509,9 +510,10 @@ type AuthUser = {
 // ===============================
 // Sidebar Menu States
 // ===============================
-const openMenu = ref("shipment"); // Main menu
 
-const openSubMenu = ref("shipments"); // Default open submenu
+const openMenu = ref<string | null>(null);
+
+const openSubMenu = ref<string | null>(null);
 
 // Toggle Main Menu
 const toggleMenu = (menu: string) => {
@@ -545,7 +547,66 @@ onMounted(() => {
 })
 
 const page = usePage();
-const currentRoute = page.url;
+
+const currentRoute = computed(() => page.url);
+
+const getActiveMenu = (url: string): string | null => {
+
+    if (
+        url.startsWith('/admin/posts') ||
+        url.startsWith('/admin/categories')
+    ) {
+        return 'blog';
+    }
+
+    if (
+        url.startsWith('/admin/shipments') ||
+        url.startsWith('/admin/partners') ||
+        url.startsWith('/admin/carriers')
+    ) {
+        return 'shipment';
+    }
+
+    if (url.startsWith('/admin/leadership')) {
+        return 'leadership';
+    }
+
+    if (url.startsWith('/admin/careers')) {
+        return 'career';
+    }
+
+    if (url.startsWith('/admin/users')) {
+        return 'users';
+    }
+
+    if (url.startsWith('/admin/projects')) {
+        return 'projects';
+    }
+
+    if (url.startsWith('/admin/communication')) {
+        return 'communication';
+    }
+
+    if (url.startsWith('/admin/administration')) {
+        return 'administration';
+    }
+
+    if (url.startsWith('/admin/account')) {
+        return 'account';
+    }
+
+    return null;
+};
+
+watch(
+    currentRoute,
+    (url) => {
+        openMenu.value = getActiveMenu(url);
+        openSubMenu.value = null;
+    },
+    { immediate: true }
+);
+
 const user = computed(() => page.props.auth.user as AuthUser | null);
 const canAccess = (permission: string) => computed(() => Boolean(user.value?.isSuperAdmin || user.value?.can?.[permission]));
 

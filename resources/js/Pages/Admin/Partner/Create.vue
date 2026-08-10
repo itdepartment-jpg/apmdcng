@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, router, useForm } from "@inertiajs/vue3";
 
 const form = useForm({
     name: "",
@@ -12,9 +12,10 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route("partners.store"));
+    form.post(route("admin.partners.store"));
 };
 </script>
+
 
 <template>
     <AuthenticatedLayout>
@@ -161,27 +162,28 @@ const submit = () => {
 
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="mt-8 flex justify-end gap-3">
+                   <!-- Action Buttons -->
+                    <div class="mt-8 flex items-center justify-end gap-3">
 
+                        <!-- Cancel -->
                         <button
                             type="button"
-                            class="px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
-                            @click="$inertia.visit('/admin/partners')"
+                            @click="router.visit(route('admin.partners.index'))"
+                            class="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
                         >
                             Cancel
                         </button>
 
+                        <!-- Save Partner -->
                         <button
                             type="submit"
                             :disabled="form.processing"
-                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="px-6 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {{ form.processing ? "Saving Partner..." : "Save Partner" }}
                         </button>
 
                     </div>
-
                 </form>
 
             </div>

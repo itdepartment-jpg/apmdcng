@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 
 use App\Models\User;
+use App\Models\Post;
 use App\Models\Partner;
 use App\Models\Carrier;
 use App\Models\Shipment;
@@ -19,17 +20,19 @@ class DashboardController extends Controller
 
             'stats' => [
 
-                'leadership' => LeadershipTeam::count(),
+                'posts' => Post::count(),
 
                 'shipments' => Shipment::count(),
+
+                'leadership' => LeadershipTeam::count(),
+
+                'users' => User::count(),
 
                 'partners' => Partner::count(),
 
                 'carriers' => Carrier::count(),
 
-                'users' => User::count(),
-
-            ]
+            ],
 
         ]);
     }

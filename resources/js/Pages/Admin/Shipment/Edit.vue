@@ -1,11 +1,22 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, router } from "@inertiajs/vue3";
 
 const props = defineProps({
-    shipment: Object,
-    partners: Array,
-    carriers: Array,
+    shipment: {
+        type: Object,
+        required: true,
+    },
+
+    partners: {
+        type: Array,
+        default: () => [],
+    },
+
+    carriers: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const form = useForm({
@@ -19,7 +30,20 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.put(route("shipments.update", props.shipment.id));
+    form.put(
+        route("admin.shipments.update", props.shipment.id),
+        {
+            preserveScroll: true,
+
+            onSuccess: () => {
+                console.log("Shipment updated successfully.");
+            },
+
+            onError: (errors) => {
+                console.error("Shipment update failed:", errors);
+            },
+        }
+    );
 };
 </script>
 
@@ -206,10 +230,10 @@ const submit = () => {
                     <!-- Action Buttons -->
                     <div class="mt-8 flex justify-end gap-3">
 
-                        <button
+                       <button
                             type="button"
+                            @click="router.visit(route('admin.shipments.index'))"
                             class="px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
-                            @click="$inertia.visit('/admin/shipments')"
                         >
                             Cancel
                         </button>
