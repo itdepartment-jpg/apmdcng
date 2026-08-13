@@ -8,7 +8,7 @@
             leave-to-class="opacity-0"
         >
             <div
-                v-if="$page.props.flash?.success && showFlashMessage"
+              v-if="flash.success && showFlashMessage"
                 class="fixed top-24 right-6 z-[9999] w-full max-w-md"
             >
                 <div
@@ -41,7 +41,7 @@
                         </p>
 
                         <p class="mt-1 text-sm text-gray-600">
-                            {{ $page.props.flash.success }}
+                          {{ flash.success }}  
                         </p>
                     </div>
                 </div>
@@ -552,9 +552,16 @@ import AccountSidebar from "@/Components/Sidebar/AccountSidebar.vue";
 
 const page = usePage();
 
+const flash = computed(
+    () => page.props.flash as FlashProps
+);
+
 const currentRoute = computed(() => page.url);
 
-
+interface FlashProps {
+    success?: string;
+    error?: string;
+}
 // ==========================================================
 // Authentication
 // ==========================================================
@@ -583,7 +590,7 @@ const showFlashMessage = ref(false);
 let flashTimeout: ReturnType<typeof setTimeout> | null = null;
 
 watch(
-    () => page.props.flash?.success,
+    () => flash.value.success,
     (message) => {
         if (flashTimeout) {
             clearTimeout(flashTimeout);

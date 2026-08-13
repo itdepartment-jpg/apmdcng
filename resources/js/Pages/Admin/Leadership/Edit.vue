@@ -95,7 +95,7 @@ const submit = () => {
                 // Clear only the new image field.
                 // Keep the existing leader information visible.
                 form.reset("image");
-                imagePreview.value = null;
+                
 
                 setTimeout(() => {
                     showSuccessMessage.value = false;
