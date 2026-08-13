@@ -1,4 +1,52 @@
 <template>
+            <Transition
+            enter-active-class="transition ease-out duration-300"
+            enter-from-class="opacity-0 translate-y-2"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition ease-in duration-200"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+        >
+            <div
+                v-if="$page.props.flash?.success && showFlashMessage"
+                class="fixed top-24 right-6 z-[9999] w-full max-w-md"
+            >
+                <div
+                    class="flex items-start gap-3 rounded-xl border border-green-200 bg-white px-5 py-4 shadow-2xl"
+                >
+                    <!-- Success Icon -->
+                    <div
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600"
+                    >
+                        <svg
+                            class="h-5 w-5"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M5 13l4 4L19 7"
+                            />
+                        </svg>
+                    </div>
+
+                    <!-- Message -->
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold text-gray-900">
+                            Success
+                        </p>
+
+                        <p class="mt-1 text-sm text-gray-600">
+                            {{ $page.props.flash.success }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </Transition>
     <!-- APMDC-themed Navigation -->
     <nav class="fixed top-0 z-50 w-full bg-gradient-to-r from-[#303791] to-[#EA222F] shadow-lg border-b border-[#EA222F]/30">
         <div class="px-3 py-3 lg:px-5 lg:pl-3">
@@ -470,19 +518,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { router, Link, usePage } from "@inertiajs/vue3";
-
-import ShipmentSidebar from "@/Components/Sidebar/ShipmentSidebar.vue";
-import BlogSidebar from "@/Components/Sidebar/BlogSidebar.vue";
-import LeadershipSidebar from "@/Components/Sidebar/LeadershipSidebar.vue";
-import UserSidebar from "@/Components/Sidebar/UserSidebar.vue";
-import ProjectSidebar from "@/Components/Sidebar/ProjectSidebar.vue";
-import CommunicationSidebar from "@/Components/Sidebar/CommunicationSidebar.vue";
-import AccountSidebar from "@/Components/Sidebar/AccountSidebar.vue";
-import AdministrationSidebar from "@/Components/Sidebar/AdministrationSidebar.vue";
-import CareerSidebar from "@/Components/Sidebar/CareerSidebar.vue";
-import { watch } from 'vue';
+import { computed, onMounted, ref, watch } from "vue";
+import { Link, router, usePage } from "@inertiajs/vue3";
 
 import {
     initAccordions,
@@ -495,105 +532,155 @@ import {
     initModals,
     initPopovers,
     initTabs,
-    initTooltips } from 'flowbite'
+    initTooltips,
+} from "flowbite";
 
-type AuthUser = {
-    id: number
-    name: string
-    email: string
-    roles?: string[]
-    permissions?: string[]
-    isSuperAdmin?: boolean
-    can?: Record<string, boolean>
-}
+import ShipmentSidebar from "@/Components/Sidebar/ShipmentSidebar.vue";
+import BlogSidebar from "@/Components/Sidebar/BlogSidebar.vue";
+import LeadershipSidebar from "@/Components/Sidebar/LeadershipSidebar.vue";
+import CareerSidebar from "@/Components/Sidebar/CareerSidebar.vue";
+import UserSidebar from "@/Components/Sidebar/UserSidebar.vue";
+import ProjectSidebar from "@/Components/Sidebar/ProjectSidebar.vue";
+import CommunicationSidebar from "@/Components/Sidebar/CommunicationSidebar.vue";
+import AdministrationSidebar from "@/Components/Sidebar/AdministrationSidebar.vue";
+import AccountSidebar from "@/Components/Sidebar/AccountSidebar.vue";
 
-// ===============================
-// Sidebar Menu States
-// ===============================
-const openMenu = ref<string | null>(null);
-const openSubMenu = ref<string | null>(null);
 
-// Toggle Main Menu
-const toggleMenu = (menu: string) => {
-    if (openMenu.value === menu) {
-        openMenu.value = null;
-        openSubMenu.value = null;
-    } else {
-        openMenu.value = menu;
-    }
-};
-
-// Toggle Shipment / Partner / Carrier
-const toggleSubMenu = (menu: string) => {
-    if (openSubMenu.value === menu) {
-        openSubMenu.value = null;
-    } else {
-        openSubMenu.value = menu;
-    }
-};
-
-// initialize components based on data attribute selectors
-onMounted(() => {
-    initAccordions();
-    initCarousels();
-    initCollapses();
-    initDials();
-    initDismisses();
-    initDrawers();
-    initDropdowns();
-    initModals();
-    initPopovers();
-    initTabs();
-    initTooltips();
-})
+// ==========================================================
+// Page
+// ==========================================================
 
 const page = usePage();
 
 const currentRoute = computed(() => page.url);
 
+
+// ==========================================================
+// Authentication
+// ==========================================================
+
+interface AuthUser {
+    id: number;
+    name: string;
+    email: string;
+    roles?: string[];
+    permissions?: string[];
+    isSuperAdmin?: boolean;
+    can?: Record<string, boolean>;
+}
+
+const user = computed(
+    () => page.props.auth.user as AuthUser | null
+);
+
+
+// ==========================================================
+// Flash Notifications
+// ==========================================================
+
+const showFlashMessage = ref(false);
+
+let flashTimeout: ReturnType<typeof setTimeout> | null = null;
+
+watch(
+    () => page.props.flash?.success,
+    (message) => {
+        if (flashTimeout) {
+            clearTimeout(flashTimeout);
+        }
+
+        if (!message) {
+            showFlashMessage.value = false;
+            return;
+        }
+
+        showFlashMessage.value = true;
+
+        flashTimeout = setTimeout(() => {
+            showFlashMessage.value = false;
+        }, 5000);
+    },
+    { immediate: true }
+);
+
+
+// ==========================================================
+// Sidebar Menu State
+// ==========================================================
+
+const openMenu = ref<string | null>(null);
+const openSubMenu = ref<string | null>(null);
+
+
+// ==========================================================
+// Sidebar Menu Controls
+// ==========================================================
+
+const toggleMenu = (menu: string) => {
+    if (openMenu.value === menu) {
+        openMenu.value = null;
+        openSubMenu.value = null;
+        return;
+    }
+
+    openMenu.value = menu;
+    openSubMenu.value = null;
+};
+
+const toggleSubMenu = (menu: string) => {
+    openSubMenu.value =
+        openSubMenu.value === menu
+            ? null
+            : menu;
+};
+
+
+// ==========================================================
+// Active Menu Detection
+// ==========================================================
+
 const getActiveMenu = (url: string): string | null => {
+    if (
+        url.startsWith("/admin/posts") ||
+        url.startsWith("/admin/categories")
+    ) {
+        return "blog";
+    }
 
     if (
-        url.startsWith('/admin/posts') ||
-        url.startsWith('/admin/categories')
+        url.startsWith("/admin/shipments") ||
+        url.startsWith("/admin/partners") ||
+        url.startsWith("/admin/carriers")
     ) {
-        return 'blog';
+        return "shipment";
     }
 
-    if (
-        url.startsWith('/admin/shipments') ||
-        url.startsWith('/admin/partners') ||
-        url.startsWith('/admin/carriers')
-    ) {
-        return 'shipment';
+    if (url.startsWith("/admin/leadership")) {
+        return "leadership";
     }
 
-    if (url.startsWith('/admin/leadership')) {
-        return 'leadership';
+    if (url.startsWith("/admin/careers")) {
+        return "career";
     }
 
-    if (url.startsWith('/admin/careers')) {
-        return 'career';
+    if (url.startsWith("/admin/users")) {
+        return "users";
     }
 
-    if (url.startsWith('/admin/users')) {
-        return 'users';
+    if (url.startsWith("/admin/projects")) {
+        return "projects";
     }
 
-    if (url.startsWith('/admin/projects')) {
-        return 'projects';
+    if (url.startsWith("/admin/communication")) {
+        return "communication";
     }
 
-    if (url.startsWith('/admin/communication')) {
-        return 'communication';
+    if (url.startsWith("/admin/administration")) {
+        return "administration";
     }
 
-    if (url.startsWith('/admin/administration')) {
-        return 'administration';
-    }
-
-    if (url.startsWith('/admin/account')) {
-        return 'account';
+    if (url.startsWith("/admin/account")) {
+        return "account";
     }
 
     return null;
@@ -608,92 +695,194 @@ watch(
     { immediate: true }
 );
 
-const user = computed(() => page.props.auth.user as AuthUser | null);
-const canAccess = (permission: string) => computed(() => Boolean(user.value?.isSuperAdmin || user.value?.can?.[permission]));
 
-const canEditLeadership = canAccess('editLeadership');
-const canViewUsers = canAccess('viewUsers');
-const canManageRoles = canAccess('manageRoles');
-const canManageNews = canAccess('manageNews');
-const canManageProjects = canAccess('manageProjects');
-const canManageProjectCategories = canAccess('manageProjectCategories');
-const canManageClientProjects = canAccess('manageClientProjects');
-const canManageNotes = canAccess('manageNotes');
+// ==========================================================
+// Permissions
+// ==========================================================
+
+const canAccess = (permission: string) =>
+    computed(() =>
+        Boolean(
+            user.value?.isSuperAdmin ||
+            user.value?.can?.[permission]
+        )
+    );
+
+const canEditLeadership = canAccess("editLeadership");
+const canViewUsers = canAccess("viewUsers");
+const canManageRoles = canAccess("manageRoles");
+const canManageNews = canAccess("manageNews");
+const canManageProjects = canAccess("manageProjects");
+const canManageProjectCategories = canAccess(
+    "manageProjectCategories"
+);
+const canManageClientProjects = canAccess(
+    "manageClientProjects"
+);
+const canManageNotes = canAccess("manageNotes");
+
+
+// ==========================================================
+// Logout
+// ==========================================================
 
 const logout = () => {
-    router.post(route('logout'), {}, {
-        onFinish: () => console.log('Logged out successfully'),
-    });
+    router.post(
+        route("logout"),
+        {},
+        {
+            onFinish: () => {
+                console.log("Logged out successfully.");
+            },
+        }
+    );
 };
 
 
+// ==========================================================
+// Flowbite Initialization
+// ==========================================================
+
+onMounted(() => {
+    initAccordions();
+    initCarousels();
+    initCollapses();
+    initDials();
+    initDismisses();
+    initDrawers();
+    initDropdowns();
+    initModals();
+    initPopovers();
+    initTabs();
+    initTooltips();
+});
 </script>
 
 <style scoped>
-/* Custom animations for APMDC theme */
+/* ==========================================================
+   APMDC Theme Animations
+========================================================== */
+
 .border-\[\#EA222F\] {
     position: relative;
     overflow: hidden;
 }
 
 .border-\[\#EA222F\]::after {
-    content: '';
+    content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(234, 34, 47, 0.1), transparent);
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(234, 34, 47, 0.1),
+        transparent
+    );
     animation: wave 2s linear infinite;
 }
 
 @keyframes wave {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
-/* Smooth transitions for all interactive elements */
-.bg-gradient-to-r, .bg-gradient-to-b, .bg-gradient-to-br,
-.bg-\[\#EA222F\]\/20, .bg-\[\#EA222F\]\/10 {
+
+/* ==========================================================
+   Smooth Transitions
+========================================================== */
+
+.bg-gradient-to-r,
+.bg-gradient-to-b,
+.bg-gradient-to-br,
+.bg-\[\#EA222F\]\/20,
+.bg-\[\#EA222F\]\/10 {
     transition: all 0.3s ease-in-out;
 }
 
-/* Enhanced dropdown shadows */
+
+/* ==========================================================
+   User Dropdown
+========================================================== */
+
 #dropdown-user {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 25px -5px rgba(0, 0, 0, 0.04);
+
     border: 1px solid rgba(234, 34, 47, 0.1);
 }
 
-/* Subtle nautical animation for sidebar */
+
+/* ==========================================================
+   Sidebar Animation
+========================================================== */
+
 aside::before {
-    content: '';
+    content: "";
     position: absolute;
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(234, 34, 47, 0.1) 0%, transparent 70%);
+
+    background: radial-gradient(
+        circle,
+        rgba(234, 34, 47, 0.1) 0%,
+        transparent 70%
+    );
+
     bottom: -50px;
     right: -50px;
+
     animation: nautical 8s ease-in-out infinite;
 }
 
 @keyframes nautical {
-    0%, 100% { transform: translateY(0px) scale(1); opacity: 0.3; }
-    50% { transform: translateY(-10px) scale(1.1); opacity: 0.5; }
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: translateY(-10px) scale(1.1);
+        opacity: 0.5;
+    }
 }
 
-/* Status indicator pulse */
+
+/* ==========================================================
+   Status Indicator
+========================================================== */
+
 .animate-pulse {
-    animation: status-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: status-pulse 2s cubic-bezier(0.4, 0, 0.6, 1)
+        infinite;
 }
 
 @keyframes status-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
 }
 
-/* Hover effects for menu items */
+
+/* ==========================================================
+   Menu Hover Effects
+========================================================== */
+
 .group:hover .group-hover\:shadow-md {
-    box-shadow: 0 4px 6px -1px rgba(234, 34, 47, 0.1), 0 2px 4px -1px rgba(234, 34, 47, 0.06);
+    box-shadow:
+        0 4px 6px -1px rgba(234, 34, 47, 0.1),
+        0 2px 4px -1px rgba(234, 34, 47, 0.06);
 }
 </style>

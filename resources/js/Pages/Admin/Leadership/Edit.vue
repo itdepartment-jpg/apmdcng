@@ -2,7 +2,7 @@
 import { Head, Link, useForm } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import InputError from "@/Components/InputError.vue";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 interface Leader {
     id: number;
@@ -51,7 +51,9 @@ const form = useForm({
     email: props.leader.email ?? "",
     phone: props.leader.phone ?? "",
     linkedin: props.leader.linkedin ?? "",
-    appointed_date: props.leader.appointed_date ?? "",
+    appointed_date: props.leader.appointed_date
+    ? String(props.leader.appointed_date).substring(0, 10)
+    : "",
     image: null as File | null,
 });
 
@@ -74,8 +76,10 @@ const handleImageUpload = (event: Event) => {
 | Submit
 |--------------------------------------------------------------------------
 */
-
+const showSuccessMessage = ref(false);
 const submit = () => {
+    showSuccessMessage.value = false;
+
     form.transform((data) => ({
         ...data,
         _method: "PUT",
@@ -84,8 +88,18 @@ const submit = () => {
         {
             forceFormData: true,
             preserveScroll: true,
+
             onSuccess: () => {
+                showSuccessMessage.value = true;
+
+                // Clear only the new image field.
+                // Keep the existing leader information visible.
                 form.reset("image");
+                imagePreview.value = null;
+
+                setTimeout(() => {
+                    showSuccessMessage.value = false;
+                }, 5000);
             },
         }
     );
@@ -108,6 +122,72 @@ const submit = () => {
                     <h1 class="text-2xl font-bold text-gray-800">
                         Edit Leadership Member
                     </h1>
+
+                    <Transition
+    enter-active-class="transition-all duration-300 ease-out"
+    enter-from-class="opacity-0 -translate-y-2"
+    enter-to-class="opacity-100 translate-y-0"
+    leave-active-class="transition-all duration-200 ease-in"
+    leave-from-class="opacity-100 translate-y-0"
+    leave-to-class="opacity-0 -translate-y-2"
+>
+    <div
+        v-if="showSuccessMessage"
+        class="mt-4 flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-5 py-4 shadow-sm"
+    >
+        <!-- Icon -->
+        <div
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600"
+        >
+            <svg
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                />
+            </svg>
+        </div>
+
+        <!-- Message -->
+        <div class="flex-1">
+            <p class="font-semibold text-green-800">
+                Success
+            </p>
+
+            <p class="text-sm text-green-700">
+                Team member updated successfully.
+            </p>
+        </div>
+
+        <!-- Close -->
+        <button
+            type="button"
+            @click="showSuccessMessage = false"
+            class="text-green-600 transition hover:text-green-800"
+            aria-label="Close notification"
+        >
+            <svg
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                />
+            </svg>
+        </button>
+    </div>
+</Transition>
 
                     <p class="mt-1 text-sm text-gray-500">
                         Update this leader's profile and professional information.

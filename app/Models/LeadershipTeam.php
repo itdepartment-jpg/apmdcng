@@ -15,18 +15,18 @@ class LeadershipTeam extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'name',
-        'position',
-        'image_path',
-        'description',
-        'category',
-        'order',
-        'email',
-        'phone',
-        'linkedin',
-        'appointed_date'
-    ];
+   protected $fillable = [
+    'name',
+    'position',
+    'description',
+    'category',
+    'order',
+    'image_path',
+    'email',
+    'phone',
+    'linkedin',
+    'appointed_date',
+];
 
     /**
      * The attributes that should be cast.

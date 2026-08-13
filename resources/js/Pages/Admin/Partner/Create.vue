@@ -2,6 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, router, useForm } from "@inertiajs/vue3";
 
+const showSuccessMessage = ref(false);
 const form = useForm({
     name: "",
     contact_person: "",
@@ -12,7 +13,19 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route("admin.partners.store"));
+    showSuccessMessage.value = false;
+
+    form.post(route("partners.store"), {
+        preserveScroll: true,
+
+        onSuccess: () => {
+            showSuccessMessage.value = true;
+
+            form.reset();
+
+            form.is_active = true;
+        },
+    });
 };
 </script>
 
@@ -26,6 +39,56 @@ const submit = () => {
             <h1 class="text-2xl font-bold mb-6">
                 Create Partner
             </h1>
+
+            <Transition
+    enter-active-class="transition-all duration-300 ease-out"
+    enter-from-class="opacity-0 -translate-y-2"
+    enter-to-class="opacity-100 translate-y-0"
+    leave-active-class="transition-all duration-200 ease-in"
+    leave-from-class="opacity-100 translate-y-0"
+    leave-to-class="opacity-0 -translate-y-2"
+>
+    <div
+        v-if="showSuccessMessage"
+        class="mb-6 flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-5 py-4 shadow-sm"
+    >
+        <div
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600"
+        >
+            <svg
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                />
+            </svg>
+        </div>
+
+        <div class="flex-1">
+            <p class="font-semibold text-green-800">
+                Success
+            </p>
+
+            <p class="text-sm text-green-700">
+                Partner created successfully.
+            </p>
+        </div>
+
+        <button
+            type="button"
+            @click="showSuccessMessage = false"
+            class="text-green-600 hover:text-green-800"
+        >
+            ×
+        </button>
+    </div>
+</Transition>
 
             <div class="bg-white rounded-xl shadow p-6">
 

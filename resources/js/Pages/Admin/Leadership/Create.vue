@@ -15,7 +15,6 @@ interface LeadershipForm {
     linkedin: string;
     appointed_date: string;
     image: File | null;
-    display_order: number;
 }
 
 const form = useForm<LeadershipForm>({
@@ -29,19 +28,18 @@ const form = useForm<LeadershipForm>({
     linkedin: "",
     appointed_date: "",
     image: null,
-    display_order: 1,
 });
 
 const imagePreview = ref<string | null>(null);
+const showSuccessMessage = ref(false);
 
 const previewImage = (event: Event) => {
     const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
 
-    if (!input.files?.length) {
+    if (!file) {
         return;
     }
-
-    const file = input.files[0];
 
     form.image = file;
     imagePreview.value = URL.createObjectURL(file);
@@ -53,30 +51,89 @@ const removePhoto = () => {
 };
 
 const submit = () => {
+    showSuccessMessage.value = false;
+
     form.post(route("admin.leadership.store"), {
         forceFormData: true,
-
         preserveScroll: true,
 
         onSuccess: () => {
-            console.log("Leadership member saved successfully.");
-        },
+            showSuccessMessage.value = true;
 
-        onError: (errors) => {
-            console.error("Failed to save leadership member:", errors);
+            form.reset();
+
+            form.order = 1;
+            form.image = null;
+
+            imagePreview.value = null;
         },
     });
 };
 </script>
     <template>
+    <!-- Global Flash Notification -->
+
     <AuthenticatedLayout>
         <Head title="Add Leaders" />
             <div class="p-6">
 
-            <h1 class="text-2xl font-bold mb-6">
-                Create Leader
-            </h1>
+          <h1 class="mb-6 text-2xl font-bold">
+    Add Leadership Member
+</h1>
 
+<div
+    v-if="showSuccessMessage"
+    class="mb-6 flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-5 py-4 shadow-sm"
+>
+    <div
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600"
+    >
+        <svg
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M5 13l4 4L19 7"
+            />
+        </svg>
+    </div>
+
+    <div class="flex-1">
+        <p class="font-semibold text-green-800">
+            Success
+        </p>
+
+        <p class="text-sm text-green-700">
+            Team member created successfully.
+        </p>
+    </div>
+
+    <button
+        type="button"
+        @click="showSuccessMessage = false"
+        class="text-green-600 transition hover:text-green-800"
+        aria-label="Close"
+    >
+        <svg
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+            />
+        </svg>
+    </button>
+</div>
             <div class="bg-white rounded-xl shadow p-6">
 
                 <form @submit.prevent="submit">
@@ -344,7 +401,7 @@ const submit = () => {
                                             </label>
 
                                             <input
-                                                v-model="form.display_order"
+                                                v-model="form.order"
                                                 type="number"
                                                 min="1"
                                                 class="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-[#EA222F] focus:ring-[#EA222F]"

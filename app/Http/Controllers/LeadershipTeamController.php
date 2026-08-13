@@ -17,6 +17,7 @@ class LeadershipTeamController extends Controller
      */
     public function index()
     {
+        
         return Inertia::render('Admin/Leadership/Index', [
             'header' => SectionHeader::getBySection('leadership_team'),
             'executives' => LeadershipTeam::executives()->get(),
@@ -26,6 +27,8 @@ class LeadershipTeamController extends Controller
             //            'canEdit' => true
         ]);
     }
+
+
 
     /**
  * Show the form for creating a new leadership member.
@@ -153,27 +156,33 @@ public function edit(LeadershipTeam $leadershipTeam)
 
     public function store(Request $request)
     {
-
-        //        dd($request->all());
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'position' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'required|in:executive,senior,key',
+
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:50',
+            'linkedin' => 'nullable|url|max:500',
+            'appointed_date' => 'nullable|date',
+
+            'order' => 'sometimes|integer',
+
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'order' => 'sometimes|integer'
         ]);
 
-        // Handle image upload if exists
         if ($request->hasFile('image')) {
-            $validated['image_path'] = $request->file('image')->store('leadership-images');
+            $validated['image_path'] = $request
+                ->file('image')
+                ->store('leadership-images');
         }
+
 
         LeadershipTeam::create($validated);
 
-        return back()->with('success', 'Team member created successfully');
+        return back();
     }
-
     /**
      * Update a team member
      */
@@ -256,40 +265,40 @@ public function edit(LeadershipTeam $leadershipTeam)
         return redirect()->back()->with('success', 'Team member updated successfully');
     }
     public function update(Request $request, LeadershipTeam $leadershipTeam)
-    {
-        // Handle both JSON and form-data requests
-        $input = $request->all();
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'position' => 'required|string|max:255',
+        'description' => 'required|string',
+        'category' => 'required|in:executive,senior,key',
 
-        // For multipart requests, manually merge the data
-        if (str_starts_with($request->header('Content-Type'), 'multipart/form-data')) {
-            $input = array_merge(
-                $request->except('image'),
-                ['image' => $request->file('image')]
-            );
+        'email' => 'nullable|email|max:255',
+        'phone' => 'nullable|string|max:50',
+        'linkedin' => 'nullable|url|max:500',
+        'appointed_date' => 'nullable|date',
+
+        'order' => 'sometimes|integer',
+
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+
+    if ($request->hasFile('image')) {
+        if ($leadershipTeam->image_path) {
+            Storage::delete($leadershipTeam->image_path);
         }
 
-        $validated = validator($input, [
-            'name' => 'required|string|max:255',
-            'position' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category' => 'required|in:executive,senior,key',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'order' => 'sometimes|integer'
-        ])->validate();
-
-        // Image handling
-        if ($request->hasFile('image')) {
-            // Delete old image
-            if ($leadershipTeam->image_path) {
-                Storage::delete($leadershipTeam->image_path);
-            }
-            $validated['image_path'] = $request->file('image')->store('leadership-images');
-        }
-
-        $leadershipTeam->update($validated);
-
-        return back()->with('success', 'Team member updated successfully');
+        $validated['image_path'] = $request
+            ->file('image')
+            ->store('leadership-images');
     }
+
+    $leadershipTeam->update($validated);
+
+    return back()->with(
+        'success',
+        'Team member updated successfully.'
+    );
+}
     /**
      * Update member ordering
      */

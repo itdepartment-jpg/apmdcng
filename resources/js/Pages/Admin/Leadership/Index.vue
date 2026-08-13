@@ -73,7 +73,7 @@ const deleteLeader = () => {
     }
 
     router.delete(
-        route("leadership.destroy", selectedLeader.value.id),
+        route("admin.leadership.destroy", selectedLeader.value.id),
         {
             preserveScroll: true,
 
