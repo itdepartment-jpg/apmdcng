@@ -552,8 +552,8 @@ import AccountSidebar from "@/Components/Sidebar/AccountSidebar.vue";
 
 const page = usePage();
 
-const flash = computed(
-    () => page.props.flash as FlashProps
+const flash = computed<FlashProps>(
+    () => (page.props.flash as FlashProps | undefined) ?? {}
 );
 
 const currentRoute = computed(() => page.url);

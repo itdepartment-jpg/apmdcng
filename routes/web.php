@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\CareerApplicationController;
 use App\Http\Controllers\CareerApplicationController as PublicCareerApplicationController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\TrackingController;
 
 
 
@@ -104,6 +105,13 @@ Route::get('rail-freight-services', function () {
     return view('seo-page/rail-freight-services');
 })->name('rail-freight-services');
 
+
+
+Route::get('/track-shipment', [TrackingController::class, 'index'])
+    ->name('tracking.index');
+
+Route::post('/track-shipment', [TrackingController::class, 'track'])
+    ->name('tracking.track');
 
 Route::get('career', function () {
 
