@@ -522,6 +522,14 @@ LATEST BLOG
         </div>
     </section>
 
+    <!-- =====================================================
+     TRACK SHIPMENT
+====================================================== -->
+
+    @include('partials.tracking.tracker', [
+        'variant' => 'homepage',
+    ])
+
     <!-- Features Section -->
     <section class="py-20 bg-[#FAFAFA]">
         <div class="container mx-auto px-6">

@@ -64,7 +64,7 @@
                     Track your shipment from pickup until final delivery.
                 </p>
 
-                <a href="#" class="font-semibold text-red-600 hover:text-red-700">
+                <a href="/track-shipment" class="font-semibold text-red-600 hover:text-red-700">
                     Learn More →
                 </a>
 
