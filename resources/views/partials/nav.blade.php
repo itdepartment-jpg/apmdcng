@@ -1,3 +1,16 @@
+{{-- Google Analytics / Google tag --}}
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S9SJ0KR4FQ"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-S9SJ0KR4FQ');
+</script>
+
 <!-- Navigation -->
 <header class="fixed w-full z-50 bg-white/90 backdrop-blur-sm shadow-md transition-all duration-500" id="navbar">
     <div class="container mx-auto px-6 py-2">

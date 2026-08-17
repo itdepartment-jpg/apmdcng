@@ -142,11 +142,13 @@
                 "
             >
 
-                <form
-                    action="{{ route('tracking.track') }}"
-                    method="POST"
-                >
-
+               <form
+                        action="{{ route('tracking.track') }}"
+                        method="POST"
+                        onsubmit="gtag('event', 'track_shipment', {
+                            tracking_location: '{{ $isHomepage ? 'homepage' : 'tracking_page' }}'
+                        });"
+                    >
                     @csrf
 
 

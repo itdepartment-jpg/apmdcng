@@ -159,7 +159,10 @@
 
                     <form
                         action="{{ route('tracking.track') }}"
-                        method="POST">
+                        method="POST"
+                        onsubmit="gtag('event', 'track_shipment', {
+                            tracking_location: 'tracking_page'
+                        });">
 
                         @csrf
 
