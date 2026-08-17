@@ -2,6 +2,19 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    <!-- Google Analytics / Google tag -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S9SJ0KR4FQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+        gtag('config', 'G-S9SJ0KR4FQ');
+    </script>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -20,26 +33,27 @@
 </head>
 
 <body class="font-sans antialiased">
+
     @inertia
+
+    <script>
+        // Disable right-click
+        // document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // // Disable F12, Ctrl+Shift+I, Ctrl+U
+        // document.addEventListener('keydown', function (event) {
+        //     if (
+        //         event.key === "F12" ||
+        //         (event.ctrlKey && event.shiftKey && event.key === 'I') ||
+        //         (event.ctrlKey && event.key === 'U') ||
+        //         (event.ctrlKey && event.shiftKey && event.key === 'J') ||
+        //         (event.ctrlKey && event.shiftKey && event.key === 'C')
+        //     ) {
+        //         event.preventDefault();
+        //     }
+        // });
+    </script>
+
 </body>
 
 </html>
-
-
-<script>
-    // Disable right-click
-    // document.addEventListener('contextmenu', event => event.preventDefault());
-    //
-    // // Disable F12, Ctrl+Shift+I, Ctrl+U
-    // document.addEventListener('keydown', function (event) {
-    //     if (
-    //         event.key === "F12" ||
-    //         (event.ctrlKey && event.shiftKey && event.key === 'I') ||
-    //         (event.ctrlKey && event.key === 'U') ||
-    //         (event.ctrlKey && event.shiftKey && event.key === 'J') ||
-    //         (event.ctrlKey && event.shiftKey && event.key === 'C')
-    //     ) {
-    //         event.preventDefault();
-    //     }
-    // });
-</script>
