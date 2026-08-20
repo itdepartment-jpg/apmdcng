@@ -270,7 +270,7 @@
                                 <p class="text-gray-600 text-sm">
                                     To streamline the complexity of cargo logistics with dependable solutions,
                                     delivering unparalleled customer service by leveraging our extensive knowledge and
-                                    firthand experience in the local shipping sector
+                                    firsthand experience in the local shipping sector
                                 </p>
                             </div>
                             <div
