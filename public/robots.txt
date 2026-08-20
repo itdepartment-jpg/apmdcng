@@ -1,2 +1,14 @@
 User-agent: *
-Disallow:
+Allow: /
+
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /invoicex
+Disallow: /profile
+Disallow: /notes
+Disallow: /edit/
+Disallow: /categories
+Disallow: /projects/create
+Disallow: /projects/*/edit
+
+Sitemap: https://apmdcng.com/sitemap.xml

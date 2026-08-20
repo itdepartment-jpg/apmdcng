@@ -531,7 +531,7 @@ const updateMember = (childFormData?:ChildFormData) => {
 };
 const deleteMember = (id: number) => {
     if (confirm('Are you sure you want to delete this team member?')) {
-        useForm({}).delete(route('leadership.destroy', id), {
+        useForm({}).delete(route('admin.leadership.destroy', id), {
             preserveScroll: true
         });
     }

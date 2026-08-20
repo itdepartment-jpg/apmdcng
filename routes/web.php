@@ -23,6 +23,7 @@ use App\Http\Controllers\CareerApplicationController as PublicCareerApplicationC
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\SitemapController;
 
 
 
@@ -105,7 +106,8 @@ Route::get('rail-freight-services', function () {
     return view('seo-page/rail-freight-services');
 })->name('rail-freight-services');
 
-
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])
+    ->name('sitemap');
 
 Route::get('/track-shipment', [TrackingController::class, 'index'])
     ->name('tracking.index');
