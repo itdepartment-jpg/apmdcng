@@ -15,19 +15,190 @@ class ShipmentController extends Controller
     /**
      * Display a listing of shipments.
      */
-    public function index()
-    {
-        $shipments = Shipment::with([
-            'partner',
-            'carrier',
-        ])
-            ->latest()
-            ->paginate(10);
+   public function index(Request $request)
+{
+    /*
+    |--------------------------------------------------------------------------
+    | Base Query
+    |--------------------------------------------------------------------------
+    */
 
-        return Inertia::render('Admin/Shipment/Index', [
-            'shipments' => $shipments,
+    $query = Shipment::with([
+        'partner',
+        'carrier',
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
+    $query->when($request->filled('search'), function ($query) use ($request) {
+
+        $search = $request->input('search');
+
+        $query->where(function ($query) use ($search) {
+
+            $query->where('shipment_reference', 'like', "%{$search}%")
+                ->orWhere('container_number', 'like', "%{$search}%")
+                ->orWhere('vessel_name', 'like', "%{$search}%");
+
+        });
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Status Filter
+    |--------------------------------------------------------------------------
+    */
+
+    $query->when($request->filled('status'), function ($query) use ($request) {
+
+        $query->where('status', $request->input('status'));
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Partner Filter
+    |--------------------------------------------------------------------------
+    */
+
+    $query->when($request->filled('partner_id'), function ($query) use ($request) {
+
+        $query->where('partner_id', $request->input('partner_id'));
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Carrier Filter
+    |--------------------------------------------------------------------------
+    */
+
+    $query->when($request->filled('carrier_id'), function ($query) use ($request) {
+
+        $query->where('carrier_id', $request->input('carrier_id'));
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ETA Date Range
+    |--------------------------------------------------------------------------
+    */
+
+    $query->when($request->filled('eta_from'), function ($query) use ($request) {
+
+        $query->whereDate('eta', '>=', $request->input('eta_from'));
+
+    });
+
+    $query->when($request->filled('eta_to'), function ($query) use ($request) {
+
+        $query->whereDate('eta', '<=', $request->input('eta_to'));
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Paginated Shipments
+    |--------------------------------------------------------------------------
+    */
+
+    $shipments = $query
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Summary Cards
+    |--------------------------------------------------------------------------
+    */
+
+    $totalShipments = Shipment::count();
+
+    $onTransit = Shipment::where('status', 'ON TRANSIT')->count();
+
+    $awaitingLoading = Shipment::where('status', 'AWAITING LOADING')->count();
+
+    $delivered = Shipment::whereIn('status', [
+        'DELIVERED',
+        'COMPLETED',
+    ])->count();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filter Options
+    |--------------------------------------------------------------------------
+    */
+
+    $statuses = Shipment::query()
+        ->whereNotNull('status')
+        ->where('status', '!=', '')
+        ->distinct()
+        ->orderBy('status')
+        ->pluck('status');
+
+    $partners = Partner::query()
+        ->orderBy('name')
+        ->get([
+            'id',
+            'name',
         ]);
-    }
+
+    $carriers = Carrier::query()
+        ->orderBy('name')
+        ->get([
+            'id',
+            'name',
+        ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Response
+    |--------------------------------------------------------------------------
+    */
+
+    return Inertia::render('Admin/Shipment/Index', [
+
+        'shipments' => $shipments,
+
+        'filters' => $request->only([
+            'search',
+            'status',
+            'partner_id',
+            'carrier_id',
+            'eta_from',
+            'eta_to',
+        ]),
+
+        'statuses' => $statuses,
+
+        'partners' => $partners,
+
+        'carriers' => $carriers,
+
+        'stats' => [
+            'total' => $totalShipments,
+            'on_transit' => $onTransit,
+            'awaiting_loading' => $awaitingLoading,
+            'delivered' => $delivered,
+        ],
+    ]);
+}
 
     /**
      * Show the form for creating a new shipment.
