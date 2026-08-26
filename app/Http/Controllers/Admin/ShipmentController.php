@@ -299,7 +299,8 @@ class ShipmentController extends Controller
             'eta'            => 'nullable|date',
         ]);
 
-        $shipment->update($validated);
+        $shipment->fill($validated);
+        $shipment->save();
 
         return redirect()
             ->route('admin.shipments.index')
