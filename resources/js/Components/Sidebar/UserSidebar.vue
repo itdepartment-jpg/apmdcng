@@ -29,18 +29,18 @@ const sidebarInactiveClass =
 const userLinks = [
     {
         label: "Users",
-        href: "#", // route('users.index')
+        href: route("admin.users.index"),
         icon: UsersIcon,
         active: (route: string) =>
-            route.includes("/users") &&
+            route.includes("/admin/users") &&
             !route.includes("/roles"),
     },
     {
         label: "Roles & Permissions",
-        href: "#", // route('roles.index')
+        href: route("admin.roles-permissions.index"),
         icon: ShieldCheckIcon,
         active: (route: string) =>
-            route.includes("/roles"),
+            route.includes("/roles-permissions"),
     },
 ];
 </script>
@@ -103,10 +103,8 @@ const userLinks = [
             </Link>
         </li>
 
-        <!-- Divider -->
         <li class="my-4 border-t border-white/10"></li>
     </div>
 
-    <!-- Divider -->
     <li class="my-4 border-t border-white/10"></li>
 </template>

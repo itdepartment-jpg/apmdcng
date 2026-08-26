@@ -18,45 +18,64 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
-    {
-        $users = User::with('roles')
-            ->orderBy('name')
-            ->paginate(10)
-            ->through(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'is_active' => $user->is_active,
-                    'created_at' => $user->created_at,
-                    'roles' => $user->roles->map(fn ($role) => [
-                        'name' => $role->name,
-                    ]),
-                ];
+   public function index(Request $request)
+{
+    $users = User::with('roles')
+        ->when($request->filled('search'), function ($query) use ($request) {
+            $search = $request->input('search');
+
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
             });
+        })
+        ->when($request->filled('role'), function ($query) use ($request) {
+            $query->role($request->input('role'));
+        })
+        ->when($request->filled('status'), function ($query) use ($request) {
+            $query->where(
+                'is_active',
+                $request->input('status') === 'active'
+            );
+        })
+        ->orderBy('name')
+        ->paginate(10)
+        ->withQueryString()
+        ->through(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'is_active' => $user->is_active,
+                'created_at' => $user->created_at,
+                'last_login_at' => $user->last_login_at,
+                'roles' => $user->roles->map(fn ($role) => [
+                    'name' => $role->name,
+                ]),
+            ];
+        });
 
-        return Inertia::render('Admin/Users/Index', [
-            'users' => $users,
-            'roles' => Role::all(),
-            'can' => [
-                'create' => auth()->user()->can('create users'),
-                'edit' => auth()->user()->can('edit users'),
-                'delete' => auth()->user()->can('delete users'),
-                'impersonate' => auth()->user()->can('impersonate users'),
-            ],
-            'filters' => $request->only(['search', 'role', 'status']),
-        ]);
+    return Inertia::render('Admin/Users/Index', [
+        'users' => $users,
 
-        //    return Inertia::render('Admin/Users/Index', [
-        //        'users' => $users,
-        // //        'can' => [
-        // //            'create' => auth()->user()->can('create users'),
-        // //            'edit' => auth()->user()->can('edit users'),
-        // //            'delete' => auth()->user()->can('delete users'),
-        // //        ],
-        //    ]);
-    }
+        'roles' => Role::orderBy('name')->get(),
+
+        'can' => [
+            'create' => auth()->user()->can('create users'),
+            'edit' => auth()->user()->can('edit users'),
+            'delete' => auth()->user()->can('delete users'),
+            'impersonate' => auth()->user()->can('impersonate users'),
+            'superAdmin' => auth()->user()->hasRole('super-admin'),
+            'currentUserId' => auth()->id(),
+        ],
+
+        'filters' => [
+            'search' => $request->input('search'),
+            'role' => $request->input('role'),
+            'status' => $request->input('status'),
+        ],
+    ]);
+}
 
     public function indexProfile()
     {
@@ -167,37 +186,33 @@ class UserController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', Rules\Password::defaults()],
-            'roles' => 'required|array',
-            'roles.*' => [
-                'exists:roles,name',
-                $this->superAdminRoleRule(),
-            ],
-        ]);
+        {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => ['required', Rules\Password::defaults()],
+                'roles' => 'required|array|min:1',
+                'roles.*' => [
+                    'exists:roles,name',
+                    $this->superAdminRoleRule(),
+                ],
+                'is_active' => 'sometimes|boolean',
+            ]);
 
-        $avatarPath = null;
-        if ($request->hasFile('avatar')) {
-            $avatarPath = $request->file('avatar')->store('avatars');
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'is_active' => $validated['is_active'] ?? true,
+                'email_verified_at' => Carbon::now(),
+            ]);
+
+            $user->syncRoles($validated['roles']);
+
+            return redirect()
+                ->route('admin.users.index')
+                ->with('success', 'User created successfully');
         }
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'is_active' => true,
-            'email_verified_at' => Carbon::now(),
-        ]);
-
-        $user->syncRoles($validated['roles']);
-
-        return redirect()->route('admin.users.index')
-            ->with('success', 'User created successfully');
-    }
-
     public function update(Request $request, User $user)
     {
         $this->guardSuperAdminMutation($user);
@@ -261,9 +276,19 @@ class UserController extends Controller
             abort(403, 'You cannot delete your own account from user management.');
         }
 
+        if ($user->hasRole('super-admin')) {
+            $superAdminCount = User::role('super-admin')->count();
+
+            if ($superAdminCount <= 1) {
+                abort(403, 'The last Super Admin cannot be deleted.');
+            }
+        }
+
         $user->delete();
 
-        return redirect()->route('admin.users.index');
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User deleted successfully.');
     }
 
     private function guardSuperAdminMutation(User $user): void

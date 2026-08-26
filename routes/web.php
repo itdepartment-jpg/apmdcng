@@ -420,27 +420,35 @@ Route::put(
                 'destroy',
             ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Roles & Permissions
-        |--------------------------------------------------------------------------
-        */
+       /*
+|--------------------------------------------------------------------------
+| Roles & Permissions
+|--------------------------------------------------------------------------
+*/
 
-        Route::middleware('can:manage roles')->group(function () {
+Route::middleware('can:manage roles')->group(function () {
 
-            Route::get(
-                '/roles-permissions',
-                [RolePermissionController::class, 'index']
-            )->name('roles-permissions.index');
+    Route::get(
+        '/roles-permissions',
+        [RolePermissionController::class, 'index']
+    )->name('roles-permissions.index');
 
-            Route::post(
-                '/roles-permissions',
-                [RolePermissionController::class, 'store']
-            )->name('roles-permissions.store');
+    Route::post(
+        '/roles-permissions',
+        [RolePermissionController::class, 'store']
+    )->name('roles-permissions.store');
 
-        });
+    Route::put(
+        '/roles-permissions/{role}',
+        [RolePermissionController::class, 'update']
+    )->name('roles-permissions.update');
 
+    Route::delete(
+    '/roles-permissions/{role}',
+    [RolePermissionController::class, 'destroy']
+)->name('roles-permissions.destroy');
 
+});
         /*
         |--------------------------------------------------------------------------
         | Profile
