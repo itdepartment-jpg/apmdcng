@@ -1,8 +1,10 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, router, useForm } from "@inertiajs/vue3";
+import { Head, useForm } from "@inertiajs/vue3";
+import { ref } from "vue";
 
 const showSuccessMessage = ref(false);
+
 const form = useForm({
     name: "",
     contact_person: "",
@@ -23,11 +25,13 @@ const submit = () => {
 
             form.reset();
 
+            // Restore default status
             form.is_active = true;
         },
     });
 };
 </script>
+
 
 
 <template>

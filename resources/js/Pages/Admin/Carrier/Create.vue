@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { ref } from "vue";
 import { Head, useForm } from "@inertiajs/vue3";
 
 const showSuccessMessage = ref(false);

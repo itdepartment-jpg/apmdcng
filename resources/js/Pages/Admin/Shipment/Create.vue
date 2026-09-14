@@ -42,6 +42,7 @@ const submit = () => {
     });
 };
 </script>
+
 <template>
     <AuthenticatedLayout>
         <Head title="Add Shipment" />
