@@ -209,7 +209,7 @@
         <!-- Bottom Bar -->
         <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p class="text-gray-500 text-sm mb-4 md:mb-0">
-                © 2025 APMDC Logistics. All rights reserved.
+                © 2026 APMDC Logistics. All rights reserved.
             </p>
             <div class="flex space-x-6">
                 <a href="{{ route('privacy-policy') }}"
