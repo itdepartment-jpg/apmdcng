@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 
 import {
@@ -64,6 +64,19 @@ const formatDate = (date: string | null): string => {
         year: 'numeric',
     });
 };
+
+const deletePost = (post: Post) => {
+    const confirmed = window.confirm(
+        `Are you sure you want to delete "${post.title}"?\n\nThis action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    router.delete(route('admin.posts.destroy', post.id), {
+        preserveScroll: true,
+    });
+};
+
 </script>
 
 <template>
@@ -372,6 +385,7 @@ const formatDate = (date: string | null): string => {
                                                         type="button"
                                                         class="p-2 text-red-600 rounded-md hover:bg-red-50 transition"
                                                         title="Delete Article"
+                                                        @click="deletePost(post)"
                                                     >
                                                         <TrashIcon class="w-5 h-5" />
                                                     </button>

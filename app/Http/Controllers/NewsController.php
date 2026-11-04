@@ -39,26 +39,81 @@ class NewsController extends Controller
         ]);
     }
 
-    public function indexBlade()
-    {
-        $featured = NewsArticle::where('is_featured', true)
-            ->where('published_at', '<=', now())
+    
+
+public function indexBlade(Request $request)
+{
+    // Validate filter inputs.
+    $filters = $request->validate([
+        'search' => ['nullable', 'string', 'max:150'],
+        'category' => ['nullable', 'integer', 'exists:categories,id'],
+        'sort' => ['nullable', 'in:latest,oldest'],
+    ]);
+
+    $search = $filters['search'] ?? '';
+    $categoryId = $filters['category'] ?? '';
+    $sort = $filters['sort'] ?? 'latest';
+
+    // Base query: published articles only.
+    $postsQuery = \App\Models\Post::with(['category', 'author'])
+        ->where('status', 'published')
+        ->whereNotNull('published_at')
+        ->where('published_at', '<=', now());
+
+    // Search article title, excerpt and content.
+    if ($search !== '') {
+        $postsQuery->where(function ($query) use ($search) {
+            $query->where('title', 'like', "%{$search}%")
+                ->orWhere('excerpt', 'like', "%{$search}%")
+                ->orWhere('content', 'like', "%{$search}%");
+        });
+    }
+
+    // Filter by category.
+    if ($categoryId !== '') {
+        $postsQuery->where('category_id', $categoryId);
+    }
+
+    // Show featured article only when viewing all articles.
+    $featured = null;
+
+    if ($search === '' && $categoryId === '') {
+        $featured = (clone $postsQuery)
             ->latest('published_at')
             ->first();
-
-        $latestNews = NewsArticle::where('published_at', '<=', now())
-            ->when($featured, function ($query) use ($featured) {
-                $query->where('id', '!=', $featured->id);
-            })
-            ->latest('published_at')
-            ->paginate(6);
-
-        return view('seo-page.news', [
-            'featuredArticle' => $featured,
-            'latestNews' => $latestNews,
-            'categories' => ['Projects', 'Awards', 'Innovations', 'Partnerships']
-        ]);
     }
+
+    // Exclude featured article from the remaining articles.
+    $latestNews = (clone $postsQuery)
+        ->when($featured, function ($query) use ($featured) {
+            $query->where('id', '!=', $featured->id);
+        })
+        ->when($sort === 'oldest',
+            fn ($query) => $query->oldest('published_at'),
+            fn ($query) => $query->latest('published_at')
+        )
+        ->paginate(6)
+        ->withQueryString();
+
+    // Load categories for the filter.
+    $categories = \App\Models\Category::orderBy('name')->get([
+        'id',
+        'name',
+    ]);
+
+    return view('seo-page.news', [
+        'featuredArticle' => $featured,
+        'latestNews' => $latestNews,
+        'categories' => $categories,
+        'filters' => [
+            'search' => $search,
+            'category' => $categoryId,
+            'sort' => $sort,
+        ],
+    ]);
+}
+
+
 
 
     /**
@@ -138,14 +193,31 @@ class NewsController extends Controller
         ]);
     }
 
-    public function showBlade($id)
-    {
-        $article = NewsArticle::findOrFail($id);
-        return view('seo-page.news-show', compact('article'));
-    }
+    
+public function showBlade($slug)
+{
+    $article = \App\Models\Post::with(['category', 'author'])
+        ->where('slug', $slug)
+        ->where('status', 'published')
+        ->whereNotNull('published_at')
+        ->where('published_at', '<=', now())
+        ->firstOrFail();
 
+    $relatedArticles = \App\Models\Post::with(['category', 'author'])
+        ->where('status', 'published')
+        ->whereNotNull('published_at')
+        ->where('published_at', '<=', now())
+        ->where('category_id', $article->category_id)
+        ->where('id', '!=', $article->id)
+        ->latest('published_at')
+        ->limit(3)
+        ->get();
 
-
+    return view('seo-page.news-show', compact(
+        'article',
+        'relatedArticles'
+    ));
+}
 
     /**
      * Show the form for editing an article

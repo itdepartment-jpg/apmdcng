@@ -36,9 +36,22 @@ use App\Http\Controllers\SitemapController;
 //    ]);
 // });
 
+
 Route::get('/', function () {
-    return view('seo-page/index2');
+
+    $latestPosts = \App\Models\Post::with('category')
+        ->where('status', 'published')
+        ->whereNotNull('published_at')
+        ->where('published_at', '<=', now())
+        ->latest('published_at')
+        ->take(3)
+        ->get();
+
+    return view('seo-page/index2', compact('latestPosts'));
+
 })->name('home');
+
+
 Route::get('/about', function () {
     return view('seo-page/about');
 })->name('about');
@@ -210,8 +223,11 @@ Route::get('/equipments', function () {
 //    return view('seo-page/news');
 // })->name('news');
 
-Route::get('/news', [NewsController::class, 'indexBlade'])->name('news');
-Route::get('/news/{article}', [NewsController::class, 'showBlade'])->name('news.show');
+// PUBLIC BLOG / NEWS
+Route::get('/news', [NewsController::class, 'indexBlade'])
+    ->name('news');
+
+Route::get('/news/{article:slug}', [NewsController::class, 'showBlade'])->name('news.show');
 
 Route::get('/projects', [ClientProjectDetailController::class, 'indexBlade'])->name('projects');
 // Route::get('/projects', function () {

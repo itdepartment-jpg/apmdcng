@@ -134,6 +134,13 @@
                         class="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full"></span>
                 </a>
 
+                <a href="{{ route('news') }}"
+                    class="nav-link text-neutdrk hover:text-accent font-semibold relative group transition-colors duration-300">
+                    News & Insights
+                    <span
+                        class="absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full"></span>
+                </a>
+
                 <a href="{{ route('contact.show') }}"
                     class="bg-[#EA222F] text-white font-medium py-2.5 px-6 rounded-lg transition-all duration-300 hover:bg-[#d11a26] hover:shadow-md inline-block">
                     Contact Us

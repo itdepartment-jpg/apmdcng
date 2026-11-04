@@ -1532,6 +1532,7 @@ CLIENT TESTIMONIALS
 
 </section>
 
+
 <!-- ==========================
 LATEST INSIGHTS
 ========================== -->
@@ -1540,7 +1541,8 @@ LATEST INSIGHTS
 
     <div class="container mx-auto px-6">
 
-        <div class="text-center mb-16">
+        <!-- Section Header -->
+        <div class="text-center mb-16" data-aos="fade-up">
 
             <span class="section-tag">
                 LATEST INSIGHTS
@@ -1558,131 +1560,103 @@ LATEST INSIGHTS
 
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        @if(isset($latestPosts) && $latestPosts->count())
 
-            <!-- Article 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-            <div class="blog-card">
+                @foreach($latestPosts as $article)
 
-                <div class="blog-image">
+                    @php
+                        $wordCount = str_word_count(strip_tags($article->content ?? ''));
+                        $readingTime = max(1, (int) ceil($wordCount / 200));
+                    @endphp
 
-                    <img src="{{ asset('images/APMDC Groupage Service.jpg') }}" alt="Groupage Shipping">
+                    <article class="blog-card" data-aos="fade-up"
+                        data-aos-delay="{{ ($loop->index + 1) * 100 }}">
 
-                    <span class="blog-category">
-                        GROUPAGE
-                    </span>
+                        <!-- Article Image -->
+                        <div class="blog-image">
 
-                </div>
+                            @if($article->featured_image)
+                                <img
+                                    src="{{ \Illuminate\Support\Facades\Storage::url($article->featured_image) }}"
+                                    alt="{{ $article->title }}"
+                                    loading="lazy"
+                                >
+                            @else
+                                <div class="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+                                    <i class="fas fa-newspaper text-5xl text-white/40"></i>
+                                </div>
+                            @endif
 
-                <div class="blog-content">
+                            <span class="blog-category">
+                                {{ $article->category?->name ?? 'Company News' }}
+                            </span>
 
-                    <div class="blog-meta">
-                        <span>July 2026</span>
-                        <span>5 min read</span>
-                    </div>
+                        </div>
 
-                    <h3>
-                        Everything You Need to Know About Groupage Shipping
-                    </h3>
+                        <!-- Article Content -->
+                        <div class="blog-content">
 
-                    <p>
-                        Learn how consolidated cargo helps businesses reduce
-                        shipping costs while enjoying reliable weekly departures
-                        and faster international delivery.
-                    </p>
+                            <div class="blog-meta">
+                                <span>
+                                    {{ $article->published_at?->format('F Y') }}
+                                </span>
 
-                    <a href="#" class="blog-link">
-                        Read Article →
-                    </a>
+                                <span>
+                                    {{ $readingTime }} min read
+                                </span>
+                            </div>
 
-                </div>
+                            <h3>
+                                <a href="{{ route('news.show', $article->slug) }}"
+                                   class="text-gray-900 hover:text-[#EA222F] transition-colors">
+                                    {{ $article->title }}
+                                </a>
+                            </h3>
 
-            </div>
+                            <p>
+                                {{ \Illuminate\Support\Str::limit(
+                                    strip_tags($article->excerpt ?: $article->content),
+                                    130
+                                ) }}
+                            </p>
 
-            <!-- Article 2 -->
+                            <a href="{{ route('news.show', $article->slug) }}"
+                               class="blog-link">
+                                Read Article
+                                <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
 
-            <div class="blog-card">
+                        </div>
 
-                <div class="blog-image">
+                    </article>
 
-                    <img src="{{ asset('images/ap2.jpg') }}" alt="Customs Clearance">
-
-                    <span class="blog-category">
-                        CUSTOMS
-                    </span>
-
-                </div>
-
-                <div class="blog-content">
-
-                    <div class="blog-meta">
-                        <span>July 2026</span>
-                        <span>6 min read</span>
-                    </div>
-
-                    <h3>
-                        Understanding Customs Clearance in Nigeria
-                    </h3>
-
-                    <p>
-                        Discover the documentation, compliance requirements and
-                        customs procedures that ensure your cargo clears Nigerian
-                        ports without unnecessary delays.
-                    </p>
-
-                    <a href="#" class="blog-link">
-                        Read Article →
-                    </a>
-
-                </div>
+                @endforeach
 
             </div>
 
-            <!-- Article 3 -->
+        @else
 
-            <div class="blog-card">
+            <div class="text-center py-12">
+                <i class="far fa-newspaper text-5xl text-gray-300 mb-5"></i>
 
-                <div class="blog-image">
+                <h3 class="text-xl font-bold text-gray-800 mb-3">
+                    No Articles Available Yet
+                </h3>
 
-                    <img src="{{ asset('images/APMDC Warehousing Services.jpg') }}" alt="Shipping Costs">
-
-                    <span class="blog-category">
-                        LOGISTICS
-                    </span>
-
-                </div>
-
-                <div class="blog-content">
-
-                    <div class="blog-meta">
-                        <span>July 2026</span>
-                        <span>4 min read</span>
-                    </div>
-
-                    <h3>
-                        7 Practical Ways to Reduce International Shipping Costs
-                    </h3>
-
-                    <p>
-                        From choosing the right freight option to consolidating
-                        shipments, explore proven strategies that save your
-                        business money.
-                    </p>
-
-                    <a href="#" class="blog-link">
-                        Read Article →
-                    </a>
-
-                </div>
-
+                <p class="text-gray-500">
+                    Check back soon for the latest news and insights from APMDC.
+                </p>
             </div>
 
-        </div>
+        @endif
 
+        <!-- View All Articles -->
         <div class="text-center mt-16">
 
-            <a href="#"
-                class="inline-block bg-[#EA222F] hover:bg-[#d11a26] text-white font-semibold px-8 py-4 rounded-lg transition">
+            <a href="{{ url('/news') }}"
+               class="inline-block bg-[#EA222F] hover:bg-[#d11a26] text-white font-semibold px-8 py-4 rounded-lg transition">
 
                 View All Articles
 
@@ -1693,6 +1667,7 @@ LATEST INSIGHTS
     </div>
 
 </section>
+
 
     @php
         $homepageFaqs = [

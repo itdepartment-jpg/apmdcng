@@ -115,7 +115,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#"
+                        <a href="/news"
                             class="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group">
                             <span
                                 class="w-1 h-1 bg-accent rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -138,14 +138,7 @@
                             Refund Policy
                         </a>
                     </li>
-                    <li>
-                        <a href="#"
-                            class="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group">
-                            <span
-                                class="w-1 h-1 bg-accent rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                            News & Media
-                        </a>
-                    </li>
+                    
                     <li>
                         <a href="https://enterprise.apmdcng.net/" target="_blank"
                             class="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group">
